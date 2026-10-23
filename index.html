@@ -63,12 +63,12 @@
   /* ============ CHARACTER STAGE ============ */
   .stage {
     position: relative;
-    height: 240px;
+    height: 320px;
     flex-shrink: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
-    background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.08) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center bottom, rgba(34, 211, 238, 0.12) 0%, transparent 70%);
     overflow: hidden;
   }
 
@@ -99,12 +99,13 @@
     border-bottom-right-radius: 4px;
     font-size: 13px;
     font-weight: 600;
-    max-width: 140px;
+    max-width: 160px;
     opacity: 0;
     transform: scale(0.5);
     transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     pointer-events: none;
+    z-index: 20;
   }
   .speech-bubble.show {
     opacity: 1;
@@ -122,12 +123,45 @@
     border-bottom-right-radius: 3px;
   }
 
-  /* Character container */
+  /* Status pill */
+  .status-pill {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 15;
+    transition: all .3s;
+    white-space: nowrap;
+  }
+  .status-pill.active {
+    color: var(--accent);
+    border-color: rgba(34, 211, 238, 0.4);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+  }
+
+  /* Character container - CLICKABLE */
   .character {
     position: relative;
-    width: 180px;
-    height: 220px;
+    width: 240px;
+    height: 290px;
     animation: float 3s ease-in-out infinite;
+    cursor: pointer;
+    transition: transform .2s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .character:hover {
+    transform: scale(1.03);
+  }
+  .character:active {
+    transform: scale(0.97);
   }
   @keyframes float {
     0%, 100% { transform: translateY(0); }
@@ -140,8 +174,8 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 100px;
-    height: 14px;
+    width: 140px;
+    height: 18px;
     background: radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%);
     animation: shadowPulse 3s ease-in-out infinite;
   }
@@ -156,8 +190,8 @@
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 140px;
-    height: 160px;
+    width: 180px;
+    height: 210px;
     transition: transform .3s;
   }
 
@@ -167,8 +201,8 @@
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 130px;
-    height: 30px;
+    width: 170px;
+    height: 38px;
     background: var(--hat);
     border-radius: 6px;
     z-index: 3;
@@ -177,34 +211,34 @@
   .hat::before {
     content: '';
     position: absolute;
-    top: -18px;
+    top: -22px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60px;
-    height: 22px;
+    width: 78px;
+    height: 28px;
     background: var(--hat);
     border-radius: 4px 4px 2px 2px;
   }
   .tassel {
     position: absolute;
-    top: -14px;
-    right: -6px;
-    width: 14px;
-    height: 14px;
+    top: -18px;
+    right: -8px;
+    width: 18px;
+    height: 18px;
     background: var(--hat-gold);
     border-radius: 50%;
-    box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
     animation: tasselSwing 2s ease-in-out infinite;
     transform-origin: top center;
   }
   .tassel::after {
     content: '';
     position: absolute;
-    top: 10px;
+    top: 14px;
     left: 50%;
     transform: translateX(-50%);
-    width: 3px;
-    height: 14px;
+    width: 4px;
+    height: 18px;
     background: var(--hat-gold);
     border-radius: 2px;
   }
@@ -216,11 +250,11 @@
   /* Face */
   .face {
     position: absolute;
-    top: 28px;
+    top: 36px;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;
-    height: 120px;
+    width: 156px;
+    height: 156px;
     background: radial-gradient(circle at 35% 35%, #fde4c7, var(--skin) 60%, var(--skin-dark));
     border-radius: 50%;
     box-shadow: inset -4px -6px 12px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.2);
@@ -230,19 +264,19 @@
   /* Glasses */
   .glasses {
     position: absolute;
-    top: 42px;
+    top: 54px;
     left: 50%;
     transform: translateX(-50%);
-    width: 96px;
-    height: 32px;
+    width: 124px;
+    height: 42px;
     z-index: 4;
   }
   .lens {
     position: absolute;
     top: 0;
-    width: 34px;
-    height: 32px;
-    border: 3px solid #1f2937;
+    width: 44px;
+    height: 42px;
+    border: 4px solid #1f2937;
     border-radius: 50%;
     background: rgba(255,255,255,0.1);
   }
@@ -251,28 +285,28 @@
   .glasses::before {
     content: '';
     position: absolute;
-    top: 14px;
+    top: 18px;
     left: 50%;
     transform: translateX(-50%);
-    width: 12px;
-    height: 3px;
+    width: 16px;
+    height: 4px;
     background: #1f2937;
   }
 
   /* Eyes */
   .eyes {
     position: absolute;
-    top: 52px;
+    top: 68px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
+    width: 104px;
     display: flex;
     justify-content: space-between;
     z-index: 5;
   }
   .eye {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     background: white;
     border-radius: 50%;
     position: relative;
@@ -284,8 +318,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 9px;
-    height: 9px;
+    width: 12px;
+    height: 12px;
     background: #1f2937;
     border-radius: 50%;
     transition: all .3s;
@@ -295,8 +329,8 @@
     position: absolute;
     top: 1px;
     right: 1px;
-    width: 3px;
-    height: 3px;
+    width: 4px;
+    height: 4px;
     background: white;
     border-radius: 50%;
   }
@@ -313,26 +347,26 @@
   /* Cheeks */
   .cheek {
     position: absolute;
-    top: 82px;
-    width: 16px;
-    height: 10px;
+    top: 108px;
+    width: 20px;
+    height: 13px;
     background: #f9a8a8;
     border-radius: 50%;
     opacity: 0.6;
     z-index: 3;
     filter: blur(1px);
   }
-  .cheek.left { left: 18px; }
-  .cheek.right { right: 18px; }
+  .cheek.left { left: 24px; }
+  .cheek.right { right: 24px; }
 
   /* Mouth */
   .mouth {
     position: absolute;
-    top: 100px;
+    top: 130px;
     left: 50%;
     transform: translateX(-50%);
-    width: 22px;
-    height: 10px;
+    width: 28px;
+    height: 13px;
     background: #7c2d12;
     border-radius: 0 0 20px 20px;
     z-index: 4;
@@ -342,19 +376,19 @@
   /* Bowtie */
   .bowtie {
     position: absolute;
-    top: 150px;
+    top: 196px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 18px;
+    width: 52px;
+    height: 24px;
     z-index: 3;
   }
   .bowtie::before, .bowtie::after {
     content: '';
     position: absolute;
     top: 0;
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     background: linear-gradient(135deg, #ef4444, #b91c1c);
     border-radius: 4px;
   }
@@ -362,11 +396,11 @@
   .bowtie::after { right: 0; transform: rotate(45deg); }
   .bowtie-center {
     position: absolute;
-    top: 4px;
+    top: 6px;
     left: 50%;
     transform: translateX(-50%);
-    width: 8px;
-    height: 10px;
+    width: 10px;
+    height: 12px;
     background: #991b1b;
     border-radius: 2px;
     z-index: 1;
@@ -374,26 +408,26 @@
 
   /* ============ EXPRESSIONS ============ */
   /* Listening - mata melotot, mulut O */
-  .character.listening .head-wrap {
-    animation: shake 0.4s ease-in-out infinite;
+  .character.listening {
+    animation: shake 0.4s ease-in-out infinite !important;
   }
   @keyframes shake {
-    0%, 100% { transform: translateX(-50%) rotate(0); }
-    25% { transform: translateX(-50%) rotate(-3deg); }
-    75% { transform: translateX(-50%) rotate(3deg); }
+    0%, 100% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-4px) rotate(-3deg); }
+    75% { transform: translateY(-4px) rotate(3deg); }
   }
   .character.listening .eye {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
     animation: none;
   }
   .character.listening .pupil {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   .character.listening .mouth {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: #7c2d12;
   }
@@ -411,8 +445,8 @@
     transform: translateX(-50%);
   }
   .character.thinking .mouth {
-    width: 18px;
-    height: 6px;
+    width: 24px;
+    height: 8px;
     border-radius: 0 0 10px 10px;
     transform: translateX(-50%) rotate(-10deg);
   }
@@ -423,27 +457,27 @@
   }
   @keyframes bounce {
     0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(-4px); }
+    50% { transform: translateX(-50%) translateY(-6px); }
   }
   .character.speaking .mouth {
     animation: talk 0.3s ease-in-out infinite;
   }
   @keyframes talk {
-    0%, 100% { height: 8px; width: 20px; border-radius: 0 0 20px 20px; }
-    50% { height: 16px; width: 16px; border-radius: 50%; }
+    0%, 100% { height: 10px; width: 26px; border-radius: 0 0 20px 20px; }
+    50% { height: 22px; width: 20px; border-radius: 50%; }
   }
 
   /* Happy - mata ^^, mulut lebar */
   .character.happy .eye {
-    height: 6px;
+    height: 8px;
     border-radius: 10px 10px 0 0;
     background: #1f2937;
     animation: none;
   }
   .character.happy .pupil { display: none; }
   .character.happy .mouth {
-    width: 30px;
-    height: 14px;
+    width: 40px;
+    height: 18px;
     border-radius: 0 0 30px 30px;
   }
 
@@ -516,45 +550,6 @@
     30% { transform: translateY(-6px); opacity: 1; }
   }
 
-  footer {
-    padding: 12px 16px 20px;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .mic-btn {
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    border: none;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: white;
-    font-size: 26px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all .2s;
-    box-shadow: 0 4px 20px rgba(34, 211, 238, 0.4);
-  }
-  .mic-btn:disabled { opacity: .5; cursor: not-allowed; }
-  .mic-btn.listening {
-    animation: pulse 1.5s infinite;
-    background: linear-gradient(135deg, #ef4444, #f97316);
-  }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-    50% { box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); }
-  }
-  .status {
-    flex: 1;
-    font-size: 13px;
-    color: var(--muted);
-    min-height: 20px;
-  }
-  .status.active { color: var(--accent); }
-
   .welcome {
     text-align: center;
     padding: 20px;
@@ -622,7 +617,7 @@
   <div class="title-wrap">
     <div class="title">
       <h1>🎓 Guru Bahasa</h1>
-      <p id="subtitle">Ngobrol santai, belajar asyik</p>
+      <p id="subtitle">Klik guru buat ngobrol!</p>
     </div>
   </div>
   <button class="icon-btn" id="settingsBtn" title="Pengaturan">⚙️</button>
@@ -637,10 +632,13 @@
   <div class="particle" style="left: 85%; animation-delay: 4.5s;"></div>
 
   <!-- Speech bubble -->
-  <div class="speech-bubble" id="speechBubble">Halo!</div>
+  <div class="speech-bubble" id="speechBubble">Halo! 👋</div>
 
-  <!-- Character -->
-  <div class="character idle" id="character">
+  <!-- Status pill -->
+  <div class="status-pill" id="status">Klik aku buat mulai ngobrol</div>
+
+  <!-- Character - CLICKABLE -->
+  <div class="character idle" id="character" title="Klik untuk bicara">
     <div class="head-wrap">
       <!-- Hat -->
       <div class="hat">
@@ -676,14 +674,9 @@
 <main id="chat">
   <div class="welcome" id="welcome">
     <h3>Halo! Aku guru bahasamu 👋</h3>
-    <p>Tekan tombol mic buat ngobrol santai. Kita bisa latihan bahasa bareng — santai aja kayak ngopi bareng!</p>
+    <p>Klik guru di atas buat mulai ngobrol. Kita latihan bahasa santai bareng!</p>
   </div>
 </main>
-
-<footer>
-  <div class="status" id="status">Siap ngobrol. Tekan mic untuk mulai.</div>
-  <button class="mic-btn" id="micBtn" title="Tekan untuk bicara">🎤</button>
-</footer>
 
 <!-- Settings Modal -->
 <div class="modal-bg" id="modal">
@@ -741,7 +734,6 @@ const state = {
 // ============ ELEMENTS ============
 const chatEl = document.getElementById('chat');
 const welcomeEl = document.getElementById('welcome');
-const micBtn = document.getElementById('micBtn');
 const statusEl = document.getElementById('status');
 const subtitleEl = document.getElementById('subtitle');
 const modal = document.getElementById('modal');
@@ -763,7 +755,6 @@ function setExpression(expr, bubbleText = null) {
     speechBubble.textContent = bubbleText;
     speechBubble.classList.add('show');
   } else if (expr === 'idle' || expr === 'happy') {
-    // keep bubble for a bit then hide
     setTimeout(() => {
       if (character.className.includes('idle') || character.className.includes('happy')) {
         speechBubble.classList.remove('show');
@@ -798,7 +789,7 @@ function updateSubtitle() {
     'Korean': '한국어로 수다',
     'Spanish': 'Charla relajada en español',
   };
-  subtitleEl.textContent = map[state.targetLang] || 'Ngobrol santai';
+  subtitleEl.textContent = map[state.targetLang] || 'Klik guru buat ngobrol!';
 }
 
 // ============ VOICES ============
@@ -955,30 +946,31 @@ function startListening() {
   try {
     recognition.start();
     state.isListening = true;
-    micBtn.classList.add('listening');
-    micBtn.innerHTML = '⏹️';
     setExpression('listening', 'Iya? 👂');
-    setStatus('Lagi dengerin... ngomong dong 🎧', true);
+    setStatus('🎧 Lagi dengerin... ngomong dong', true);
   } catch (err) { console.error(err); }
 }
 
 function stopListening() {
   state.isListening = false;
-  micBtn.classList.remove('listening');
-  micBtn.innerHTML = '🎤';
   try { recognition.stop(); } catch(e) {}
 }
 
-micBtn.addEventListener('click', () => {
+// ============ CHARACTER CLICK HANDLER ============
+character.addEventListener('click', () => {
   if (state.isListening) {
+    // Stop listening
     stopListening();
     setExpression('idle');
-    setStatus('Diberhentikan.');
+    setStatus('Diberhentikan. Klik lagi buat ngobrol.');
+  } else if (state.isSpeaking) {
+    // Stop speaking
+    speechSynthesis.cancel();
+    state.isSpeaking = false;
+    setExpression('idle');
+    setStatus('Diberhentikan. Klik lagi buat ngobrol.');
   } else {
-    if (state.isSpeaking) {
-      speechSynthesis.cancel();
-      state.isSpeaking = false;
-    }
+    // Start listening
     startListening();
   }
 });
@@ -994,7 +986,7 @@ async function handleUserInput(text) {
   }
   addTyping();
   setExpression('thinking', 'Hmm... 🤔');
-  setStatus('Guru lagi mikir... 🤔', true);
+  setStatus('🤔 Guru lagi mikir...', true);
   try {
     const reply = await callGPT(text);
     removeTyping();
@@ -1005,7 +997,7 @@ async function handleUserInput(text) {
     console.error(err);
     addSystemMessage('Ups, ada error: ' + err.message);
     setExpression('idle', 'Yah error 😵');
-    setStatus('Error. Coba lagi ya.');
+    setStatus('Error. Klik lagi buat coba.');
   }
 }
 
@@ -1088,12 +1080,12 @@ function speak(text) {
   utter.onstart = () => {
     state.isSpeaking = true;
     setExpression('speaking', 'Dengerin ya! 🗣️');
-    setStatus('Guru lagi ngomong... 🔊', true);
+    setStatus('🔊 Guru lagi ngomong...', true);
   };
   utter.onend = () => {
     state.isSpeaking = false;
-    setExpression('happy', 'Giliranmu! 🎤');
-    setStatus('Siap ngobrol lagi. Tekan mic 🎤');
+    setExpression('happy', 'Giliranmu! 👆');
+    setStatus('Klik guru buat ngobrol lagi');
   };
   utter.onerror = () => {
     state.isSpeaking = false;
