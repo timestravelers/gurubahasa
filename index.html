@@ -13,9 +13,10 @@
     --accent2: #a78bfa;
     --text: #e2e8f0;
     --muted: #94a3b8;
-    --user: #1e40af;
-    --ai: #0f766e;
-    --danger: #ef4444;
+    --skin: #fcd9b6;
+    --skin-dark: #e8b890;
+    --hat: #1f2937;
+    --hat-gold: #fbbf24;
   }
   html, body {
     height: 100%;
@@ -32,8 +33,9 @@
     margin: 0 auto;
     position: relative;
   }
+
   header {
-    padding: 16px 20px;
+    padding: 12px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -43,14 +45,6 @@
     z-index: 10;
   }
   .title-wrap { display: flex; align-items: center; gap: 12px; }
-  .avatar {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
-  }
   .title h1 { font-size: 18px; font-weight: 700; }
   .title p { font-size: 12px; color: var(--muted); }
   .icon-btn {
@@ -61,24 +55,409 @@
     border-radius: 50%;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
     transition: all .2s;
   }
   .icon-btn:hover { background: rgba(255,255,255,0.12); }
 
+  /* ============ CHARACTER STAGE ============ */
+  .stage {
+    position: relative;
+    height: 240px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.08) 0%, transparent 70%);
+    overflow: hidden;
+  }
+
+  /* Floating particles */
+  .particle {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.3;
+    animation: floatUp 6s infinite ease-in;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(100px) scale(0); opacity: 0; }
+    20% { opacity: 0.4; }
+    100% { transform: translateY(-100px) scale(1); opacity: 0; }
+  }
+
+  /* Speech bubble */
+  .speech-bubble {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: white;
+    color: #1f2937;
+    padding: 10px 14px;
+    border-radius: 18px;
+    border-bottom-right-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    max-width: 140px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    pointer-events: none;
+  }
+  .speech-bubble.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    right: 20px;
+    width: 12px;
+    height: 12px;
+    background: white;
+    transform: rotate(45deg);
+    border-bottom-right-radius: 3px;
+  }
+
+  /* Character container */
+  .character {
+    position: relative;
+    width: 180px;
+    height: 220px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* Shadow */
+  .shadow {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 14px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%);
+    animation: shadowPulse 3s ease-in-out infinite;
+  }
+  @keyframes shadowPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+    50% { transform: translateX(-50%) scale(0.85); opacity: 0.3; }
+  }
+
+  /* Head wrap */
+  .head-wrap {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 160px;
+    transition: transform .3s;
+  }
+
+  /* Hat (topi toga) */
+  .hat {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 130px;
+    height: 30px;
+    background: var(--hat);
+    border-radius: 6px;
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .hat::before {
+    content: '';
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 22px;
+    background: var(--hat);
+    border-radius: 4px 4px 2px 2px;
+  }
+  .tassel {
+    position: absolute;
+    top: -14px;
+    right: -6px;
+    width: 14px;
+    height: 14px;
+    background: var(--hat-gold);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+    animation: tasselSwing 2s ease-in-out infinite;
+    transform-origin: top center;
+  }
+  .tassel::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 14px;
+    background: var(--hat-gold);
+    border-radius: 2px;
+  }
+  @keyframes tasselSwing {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+  }
+
+  /* Face */
+  .face {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle at 35% 35%, #fde4c7, var(--skin) 60%, var(--skin-dark));
+    border-radius: 50%;
+    box-shadow: inset -4px -6px 12px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 2;
+  }
+
+  /* Glasses */
+  .glasses {
+    position: absolute;
+    top: 42px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 96px;
+    height: 32px;
+    z-index: 4;
+  }
+  .lens {
+    position: absolute;
+    top: 0;
+    width: 34px;
+    height: 32px;
+    border: 3px solid #1f2937;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+  }
+  .lens.left { left: 0; }
+  .lens.right { right: 0; }
+  .glasses::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 3px;
+    background: #1f2937;
+  }
+
+  /* Eyes */
+  .eyes {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 5;
+  }
+  .eye {
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    transition: all .3s;
+  }
+  .pupil {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 9px;
+    height: 9px;
+    background: #1f2937;
+    border-radius: 50%;
+    transition: all .3s;
+  }
+  .pupil::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  /* Blink animation */
+  .character.idle .eye {
+    animation: blink 4s infinite;
+  }
+  @keyframes blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+
+  /* Cheeks */
+  .cheek {
+    position: absolute;
+    top: 82px;
+    width: 16px;
+    height: 10px;
+    background: #f9a8a8;
+    border-radius: 50%;
+    opacity: 0.6;
+    z-index: 3;
+    filter: blur(1px);
+  }
+  .cheek.left { left: 18px; }
+  .cheek.right { right: 18px; }
+
+  /* Mouth */
+  .mouth {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 10px;
+    background: #7c2d12;
+    border-radius: 0 0 20px 20px;
+    z-index: 4;
+    transition: all .2s;
+  }
+
+  /* Bowtie */
+  .bowtie {
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 18px;
+    z-index: 3;
+  }
+  .bowtie::before, .bowtie::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    border-radius: 4px;
+  }
+  .bowtie::before { left: 0; transform: rotate(45deg); }
+  .bowtie::after { right: 0; transform: rotate(45deg); }
+  .bowtie-center {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 10px;
+    background: #991b1b;
+    border-radius: 2px;
+    z-index: 1;
+  }
+
+  /* ============ EXPRESSIONS ============ */
+  /* Listening - mata melotot, mulut O */
+  .character.listening .head-wrap {
+    animation: shake 0.4s ease-in-out infinite;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(-50%) rotate(0); }
+    25% { transform: translateX(-50%) rotate(-3deg); }
+    75% { transform: translateX(-50%) rotate(3deg); }
+  }
+  .character.listening .eye {
+    width: 22px;
+    height: 22px;
+    animation: none;
+  }
+  .character.listening .pupil {
+    width: 6px;
+    height: 6px;
+  }
+  .character.listening .mouth {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #7c2d12;
+  }
+
+  /* Thinking - mata liat atas, mulut miring */
+  .character.thinking .head-wrap {
+    animation: tilt 2s ease-in-out infinite;
+  }
+  @keyframes tilt {
+    0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+    50% { transform: translateX(-50%) rotate(5deg); }
+  }
+  .character.thinking .pupil {
+    top: 20%;
+    transform: translateX(-50%);
+  }
+  .character.thinking .mouth {
+    width: 18px;
+    height: 6px;
+    border-radius: 0 0 10px 10px;
+    transform: translateX(-50%) rotate(-10deg);
+  }
+
+  /* Speaking - mulut buka-tutup */
+  .character.speaking .head-wrap {
+    animation: bounce 0.5s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-4px); }
+  }
+  .character.speaking .mouth {
+    animation: talk 0.3s ease-in-out infinite;
+  }
+  @keyframes talk {
+    0%, 100% { height: 8px; width: 20px; border-radius: 0 0 20px 20px; }
+    50% { height: 16px; width: 16px; border-radius: 50%; }
+  }
+
+  /* Happy - mata ^^, mulut lebar */
+  .character.happy .eye {
+    height: 6px;
+    border-radius: 10px 10px 0 0;
+    background: #1f2937;
+    animation: none;
+  }
+  .character.happy .pupil { display: none; }
+  .character.happy .mouth {
+    width: 30px;
+    height: 14px;
+    border-radius: 0 0 30px 30px;
+  }
+
+  /* ============ CHAT ============ */
   main {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 16px;
+    padding: 16px;
     scroll-behavior: smooth;
   }
   main::-webkit-scrollbar { width: 6px; }
   main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 
-  .msg {
-    display: flex;
-    margin-bottom: 14px;
-    animation: slideIn .3s ease;
-  }
+  .msg { display: flex; margin-bottom: 12px; animation: slideIn .3s ease; }
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -91,7 +470,6 @@
     font-size: 15px;
     line-height: 1.5;
     word-wrap: break-word;
-    position: relative;
   }
   .msg.user .bubble {
     background: linear-gradient(135deg, #1e40af, #3b82f6);
@@ -124,20 +502,16 @@
     font-style: italic;
   }
 
-  .typing {
-    display: inline-flex;
-    gap: 4px;
-    padding: 4px 0;
-  }
+  .typing { display: inline-flex; gap: 4px; padding: 4px 0; }
   .typing span {
     width: 7px; height: 7px;
     background: var(--accent);
     border-radius: 50%;
-    animation: bounce 1.4s infinite ease-in-out;
+    animation: bounceDot 1.4s infinite ease-in-out;
   }
   .typing span:nth-child(2) { animation-delay: .2s; }
   .typing span:nth-child(3) { animation-delay: .4s; }
-  @keyframes bounce {
+  @keyframes bounceDot {
     0%, 60%, 100% { transform: translateY(0); opacity: .5; }
     30% { transform: translateY(-6px); opacity: 1; }
   }
@@ -163,7 +537,6 @@
     flex-shrink: 0;
     transition: all .2s;
     box-shadow: 0 4px 20px rgba(34, 211, 238, 0.4);
-    position: relative;
   }
   .mic-btn:disabled { opacity: .5; cursor: not-allowed; }
   .mic-btn.listening {
@@ -181,6 +554,14 @@
     min-height: 20px;
   }
   .status.active { color: var(--accent); }
+
+  .welcome {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+  }
+  .welcome h3 { color: var(--text); font-size: 16px; margin-bottom: 6px; }
+  .welcome p { font-size: 13px; line-height: 1.6; }
 
   /* Modal */
   .modal-bg {
@@ -205,12 +586,7 @@
     overflow-y: auto;
   }
   .modal h2 { font-size: 18px; margin-bottom: 16px; }
-  .modal label {
-    display: block;
-    font-size: 13px;
-    color: var(--muted);
-    margin: 12px 0 6px;
-  }
+  .modal label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
   .modal input, .modal select {
     width: 100%;
     padding: 10px 12px;
@@ -221,14 +597,8 @@
     font-size: 14px;
     font-family: inherit;
   }
-  .modal input:focus, .modal select:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
-  .modal-actions {
-    display: flex; gap: 10px;
-    margin-top: 20px;
-  }
+  .modal input:focus, .modal select:focus { outline: none; border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
   .btn {
     flex: 1;
     padding: 10px 16px;
@@ -239,58 +609,74 @@
     cursor: pointer;
     transition: all .2s;
   }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: white;
-  }
-  .btn-secondary {
-    background: rgba(255,255,255,0.08);
-    color: var(--text);
-  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+  .btn-secondary { background: rgba(255,255,255,0.08); color: var(--text); }
   .btn:hover { transform: translateY(-1px); }
-  .hint {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 4px;
-    line-height: 1.5;
-  }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
   .hint a { color: var(--accent); }
-
-  .welcome {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--muted);
-  }
-  .welcome .big {
-    font-size: 48px;
-    margin-bottom: 12px;
-  }
-  .welcome h3 {
-    color: var(--text);
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-  .welcome p { font-size: 14px; line-height: 1.6; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="title-wrap">
-    <div class="avatar">🎓</div>
     <div class="title">
-      <h1>Guru Bahasa</h1>
+      <h1>🎓 Guru Bahasa</h1>
       <p id="subtitle">Ngobrol santai, belajar asyik</p>
     </div>
   </div>
   <button class="icon-btn" id="settingsBtn" title="Pengaturan">⚙️</button>
 </header>
 
+<!-- CHARACTER STAGE -->
+<div class="stage">
+  <!-- Particles -->
+  <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+  <div class="particle" style="left: 30%; animation-delay: 1.5s;"></div>
+  <div class="particle" style="left: 70%; animation-delay: 3s;"></div>
+  <div class="particle" style="left: 85%; animation-delay: 4.5s;"></div>
+
+  <!-- Speech bubble -->
+  <div class="speech-bubble" id="speechBubble">Halo!</div>
+
+  <!-- Character -->
+  <div class="character idle" id="character">
+    <div class="head-wrap">
+      <!-- Hat -->
+      <div class="hat">
+        <div class="tassel"></div>
+      </div>
+      <!-- Face -->
+      <div class="face">
+        <!-- Glasses -->
+        <div class="glasses">
+          <div class="lens left"></div>
+          <div class="lens right"></div>
+        </div>
+        <!-- Eyes -->
+        <div class="eyes">
+          <div class="eye"><div class="pupil"></div></div>
+          <div class="eye"><div class="pupil"></div></div>
+        </div>
+        <!-- Cheeks -->
+        <div class="cheek left"></div>
+        <div class="cheek right"></div>
+        <!-- Mouth -->
+        <div class="mouth"></div>
+      </div>
+      <!-- Bowtie -->
+      <div class="bowtie">
+        <div class="bowtie-center"></div>
+      </div>
+    </div>
+    <div class="shadow"></div>
+  </div>
+</div>
+
 <main id="chat">
   <div class="welcome" id="welcome">
-    <div class="big">👋</div>
-    <h3>Halo! Aku guru bahasamu</h3>
-    <p>Tekan tombol mic buat ngobrol santai. Kita bisa latihan bahasa Inggris atau Indonesia — santai aja kayak ngopi bareng teman.</p>
+    <h3>Halo! Aku guru bahasamu 👋</h3>
+    <p>Tekan tombol mic buat ngobrol santai. Kita bisa latihan bahasa bareng — santai aja kayak ngopi bareng!</p>
   </div>
 </main>
 
@@ -303,7 +689,6 @@
 <div class="modal-bg" id="modal">
   <div class="modal">
     <h2>⚙️ Pengaturan</h2>
-
     <label>Bahasa Target</label>
     <select id="targetLang">
       <option value="English">🇬🇧 English (Inggris)</option>
@@ -316,7 +701,7 @@
     <label>OpenAI API Key</label>
     <input type="password" id="apiKey" placeholder="sk-..." />
     <div class="hint">
-      Dapatkan di <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>. Key disimpan lokal di browser kamu aja, gak dikirim ke mana-mana.
+      Dapatkan di <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>. Key disimpan lokal di browser.
     </div>
 
     <label>Model</label>
@@ -368,6 +753,26 @@ const targetLangSelect = document.getElementById('targetLang');
 const modelSelect = document.getElementById('model');
 const voiceSelect = document.getElementById('voiceSelect');
 const rateInput = document.getElementById('rate');
+const character = document.getElementById('character');
+const speechBubble = document.getElementById('speechBubble');
+
+// ============ CHARACTER EXPRESSIONS ============
+function setExpression(expr, bubbleText = null) {
+  character.className = 'character ' + expr;
+  if (bubbleText) {
+    speechBubble.textContent = bubbleText;
+    speechBubble.classList.add('show');
+  } else if (expr === 'idle' || expr === 'happy') {
+    // keep bubble for a bit then hide
+    setTimeout(() => {
+      if (character.className.includes('idle') || character.className.includes('happy')) {
+        speechBubble.classList.remove('show');
+      }
+    }, 2000);
+  } else {
+    speechBubble.classList.remove('show');
+  }
+}
 
 // ============ INIT ============
 function init() {
@@ -376,10 +781,12 @@ function init() {
   if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = loadVoices;
   }
+  setExpression('idle', 'Halo! 👋');
   if (!state.apiKey) {
     setTimeout(() => {
-      addSystemMessage("Hei! Sebelum mulai, atur dulu API key OpenAI kamu ya. Tekan ⚙️ di pojok kanan atas. Tenang, gratis kok buat nyoba-nyoba.");
-    }, 500);
+      setExpression('thinking', 'API key dulu ya! ⚙️');
+      addSystemMessage("Hei! Sebelum mulai, atur dulu API key OpenAI kamu ya. Tekan ⚙️ di pojok kanan atas.");
+    }, 1500);
   }
 }
 
@@ -398,30 +805,19 @@ function updateSubtitle() {
 function loadVoices() {
   const voices = speechSynthesis.getVoices();
   voiceSelect.innerHTML = '';
-  // Prioritize voices matching target language
-  const langMap = {
-    'English': 'en',
-    'Indonesian': 'id',
-    'Japanese': 'ja',
-    'Korean': 'ko',
-    'Spanish': 'es',
-  };
+  const langMap = { 'English': 'en', 'Indonesian': 'id', 'Japanese': 'ja', 'Korean': 'ko', 'Spanish': 'es' };
   const targetCode = langMap[state.targetLang] || 'en';
-
-  // Sort: matching lang first
   const sorted = [...voices].sort((a, b) => {
     const aMatch = a.lang.toLowerCase().startsWith(targetCode) ? 0 : 1;
     const bMatch = b.lang.toLowerCase().startsWith(targetCode) ? 0 : 1;
     return aMatch - bMatch;
   });
-
-  sorted.forEach((v, i) => {
+  sorted.forEach(v => {
     const opt = document.createElement('option');
     opt.value = v.voiceURI;
     opt.textContent = `${v.name} (${v.lang})`;
     voiceSelect.appendChild(opt);
   });
-
   if (state.voiceURI) voiceSelect.value = state.voiceURI;
 }
 
@@ -445,15 +841,15 @@ saveBtn.addEventListener('click', () => {
   state.model = modelSelect.value;
   state.rate = parseFloat(rateInput.value);
   state.voiceURI = voiceSelect.value;
-
   localStorage.setItem('gb_apiKey', state.apiKey);
   localStorage.setItem('gb_targetLang', state.targetLang);
   localStorage.setItem('gb_model', state.model);
   localStorage.setItem('gb_rate', state.rate);
   localStorage.setItem('gb_voiceURI', state.voiceURI);
-
   updateSubtitle();
+  loadVoices();
   modal.classList.remove('show');
+  setExpression('happy', 'Mantap! ✅');
   setStatus('Pengaturan disimpan ✅');
 });
 
@@ -468,7 +864,6 @@ function addMessage(role, text, translation = null) {
   msg.className = `msg ${role}`;
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-
   if (role === 'ai' && translation) {
     const tag = document.createElement('span');
     tag.className = 'lang-tag';
@@ -484,11 +879,9 @@ function addMessage(role, text, translation = null) {
   } else {
     bubble.textContent = text;
   }
-
   msg.appendChild(bubble);
   chatEl.appendChild(msg);
   chatEl.scrollTop = chatEl.scrollHeight;
-  return bubble;
 }
 
 function addSystemMessage(text) {
@@ -532,7 +925,6 @@ if (SpeechRecognition) {
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = false;
-
   recognition.onresult = (e) => {
     const transcript = e.results[0][0].transcript;
     stopListening();
@@ -541,13 +933,12 @@ if (SpeechRecognition) {
   recognition.onerror = (e) => {
     console.error('Speech error:', e);
     stopListening();
-    if (e.error === 'not-allowed') {
-      setStatus('Izin mic ditolak. Cek pengaturan browser.');
-    } else if (e.error === 'no-speech') {
+    setExpression('idle');
+    if (e.error === 'not-allowed') setStatus('Izin mic ditolak. Cek pengaturan browser.');
+    else if (e.error === 'no-speech') {
+      setExpression('idle', 'Gak kedengeran 🤔');
       setStatus('Gak kedengeran. Coba lagi ya.');
-    } else {
-      setStatus('Error: ' + e.error);
-    }
+    } else setStatus('Error: ' + e.error);
   };
   recognition.onend = () => {
     if (state.isListening) stopListening();
@@ -559,24 +950,16 @@ function startListening() {
     setStatus('Browser gak support speech recognition. Coba Chrome ya.');
     return;
   }
-  const langMap = {
-    'English': 'en-US',
-    'Indonesian': 'id-ID',
-    'Japanese': 'ja-JP',
-    'Korean': 'ko-KR',
-    'Spanish': 'es-ES',
-  };
+  const langMap = { 'English': 'en-US', 'Indonesian': 'id-ID', 'Japanese': 'ja-JP', 'Korean': 'ko-KR', 'Spanish': 'es-ES' };
   recognition.lang = langMap[state.targetLang] || 'en-US';
-
   try {
     recognition.start();
     state.isListening = true;
     micBtn.classList.add('listening');
     micBtn.innerHTML = '⏹️';
+    setExpression('listening', 'Iya? 👂');
     setStatus('Lagi dengerin... ngomong dong 🎧', true);
-  } catch (err) {
-    console.error(err);
-  }
+  } catch (err) { console.error(err); }
 }
 
 function stopListening() {
@@ -589,6 +972,7 @@ function stopListening() {
 micBtn.addEventListener('click', () => {
   if (state.isListening) {
     stopListening();
+    setExpression('idle');
     setStatus('Diberhentikan.');
   } else {
     if (state.isSpeaking) {
@@ -603,15 +987,14 @@ micBtn.addEventListener('click', () => {
 async function handleUserInput(text) {
   if (!text.trim()) return;
   addMessage('user', text);
-
   if (!state.apiKey) {
     setStatus('API key belum diisi. Tekan ⚙️ buat atur.');
+    setExpression('thinking', 'API key? ⚙️');
     return;
   }
-
   addTyping();
+  setExpression('thinking', 'Hmm... 🤔');
   setStatus('Guru lagi mikir... 🤔', true);
-
   try {
     const reply = await callGPT(text);
     removeTyping();
@@ -621,6 +1004,7 @@ async function handleUserInput(text) {
     removeTyping();
     console.error(err);
     addSystemMessage('Ups, ada error: ' + err.message);
+    setExpression('idle', 'Yah error 😵');
     setStatus('Error. Coba lagi ya.');
   }
 }
@@ -631,8 +1015,8 @@ async function callGPT(userText) {
 Bahasa target yang sedang dipelajari user: ${state.targetLang}.
 
 ATURAN PENTING:
-1. Selalu balas menggunakan ${state.targetLang} (bahasa target), karena tujuannya biar user terbiasa.
-2. Jawaban singkat aja, maksimal 2-3 kalimat. Jangan panjang lebar kayak dosen.
+1. Selalu balas menggunakan ${state.targetLang} (bahasa target).
+2. Jawaban singkat aja, maksimal 2-3 kalimat.
 3. Kalau user bicara dalam bahasa Indonesia, tetap balas pakai ${state.targetLang}, tapi selipkan koreksi kecil kalau ada yang salah.
 4. Sesekali ajak user ngobrol balik dengan pertanyaan ringan.
 5. Topik bebas: hobi, makanan, film, cuaca, kehidupan sehari-hari.
@@ -645,16 +1029,13 @@ Balas dalam format JSON persis seperti ini (JANGAN pakai markdown, JANGAN pakai 
 
   const messages = [
     { role: 'system', content: systemPrompt },
-    ...state.history.slice(-10), // keep last 10 for context
+    ...state.history.slice(-10),
     { role: 'user', content: userText }
   ];
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${state.apiKey}`
-    },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` },
     body: JSON.stringify({
       model: state.model,
       messages: messages,
@@ -672,16 +1053,13 @@ Balas dalam format JSON persis seperti ini (JANGAN pakai markdown, JANGAN pakai 
   const content = data.choices[0].message.content;
 
   let parsed;
-  try {
-    parsed = JSON.parse(content);
-  } catch (e) {
-    // Fallback: try to extract JSON
+  try { parsed = JSON.parse(content); }
+  catch (e) {
     const match = content.match(/\{[\s\S]*\}/);
     if (match) parsed = JSON.parse(match[0]);
     else throw new Error('Response bukan JSON valid');
   }
 
-  // Save to history
   state.history.push({ role: 'user', content: userText });
   state.history.push({ role: 'assistant', content: parsed.text || content });
   if (state.history.length > 20) state.history = state.history.slice(-20);
@@ -702,28 +1080,24 @@ function speak(text) {
   const utter = new SpeechSynthesisUtterance(text);
   const voice = getSelectedVoice();
   if (voice) utter.voice = voice;
-
-  const langMap = {
-    'English': 'en-US',
-    'Indonesian': 'id-ID',
-    'Japanese': 'ja-JP',
-    'Korean': 'ko-KR',
-    'Spanish': 'es-ES',
-  };
+  const langMap = { 'English': 'en-US', 'Indonesian': 'id-ID', 'Japanese': 'ja-JP', 'Korean': 'ko-KR', 'Spanish': 'es-ES' };
   utter.lang = langMap[state.targetLang] || 'en-US';
   utter.rate = state.rate;
   utter.pitch = 1;
 
   utter.onstart = () => {
     state.isSpeaking = true;
+    setExpression('speaking', 'Dengerin ya! 🗣️');
     setStatus('Guru lagi ngomong... 🔊', true);
   };
   utter.onend = () => {
     state.isSpeaking = false;
+    setExpression('happy', 'Giliranmu! 🎤');
     setStatus('Siap ngobrol lagi. Tekan mic 🎤');
   };
   utter.onerror = () => {
     state.isSpeaking = false;
+    setExpression('idle');
     setStatus('TTS error.');
   };
 
