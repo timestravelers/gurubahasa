@@ -76,7 +76,6 @@
   }
   .icon-btn:hover { background: rgba(255,255,255,0.12); }
 
-  /* ============ FULL CHARACTER STAGE ============ */
   .stage {
     position: relative;
     flex: 1;
@@ -101,7 +100,6 @@
     100% { transform: translateY(-100px) scale(1); opacity: 0; }
   }
 
-  /* Speech bubble - lebih besar */
   .speech-bubble {
     position: absolute;
     top: 80px;
@@ -168,7 +166,6 @@
     box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
   }
 
-  /* History button */
   .history-btn {
     position: absolute;
     bottom: 24px;
@@ -442,7 +439,6 @@
     z-index: 1;
   }
 
-  /* ============ EXPRESSIONS ============ */
   .character.listening { animation: shake 0.4s ease-in-out infinite !important; }
   @keyframes shake {
     0%, 100% { transform: translateY(0) rotate(0); }
@@ -493,7 +489,6 @@
     border-radius: 0 0 30px 30px;
   }
 
-  /* ============ MODALS ============ */
   .modal-bg {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.7);
@@ -586,7 +581,6 @@
   }
   .preview-btn:hover { background: rgba(34, 211, 238, 0.35); }
 
-  /* History modal */
   .history-list {
     max-height: 60vh;
     overflow-y: auto;
@@ -693,7 +687,6 @@
   </div>
 </div>
 
-<!-- Settings Modal -->
 <div class="modal-bg" id="modal">
   <div class="modal">
     <h2>⚙️ Pengaturan</h2>
@@ -729,7 +722,7 @@
       <option value="shimmer">🎙️ Shimmer — manis, lembut</option>
     </select>
     <div class="hint">
-      💚 Suara dari OpenAI TTS — natural banget, gak kayak robot!
+      💚 Suara dari OpenAI TTS — natural banget!
     </div>
     <div class="voice-card">
       <span>🔊 Coba dengerin suaranya:</span>
@@ -737,7 +730,7 @@
     </div>
 
     <div class="free-info">
-      💚 <strong>Gratis total!</strong>
+      💚 <strong>Gratis total!</strong>.
     </div>
 
     <div class="modal-actions">
@@ -747,7 +740,6 @@
   </div>
 </div>
 
-<!-- History Modal -->
 <div class="modal-bg" id="historyModal">
   <div class="modal">
     <h2>💬 Riwayat Obrolan</h2>
@@ -767,8 +759,8 @@ const state = {
   targetLang: localStorage.getItem('gb_targetLang') || 'English',
   model: localStorage.getItem('gb_model') || 'gpt-4o-mini',
   voice: localStorage.getItem('gb_voice') || 'nova',
-  history: [], // {role, text, translation}
-  aiHistory: [], // untuk context AI
+  history: [],
+  aiHistory: [],
   isListening: false,
   isSpeaking: false,
   currentAudio: null,
@@ -865,7 +857,6 @@ saveBtn.addEventListener('click', () => {
   setStatus('Pengaturan disimpan ✅');
 });
 
-// History modal
 historyBtn.addEventListener('click', () => {
   renderHistory();
   historyModal.classList.add('show');
@@ -924,21 +915,11 @@ previewVoiceBtn.addEventListener('click', async () => {
   previewVoiceBtn.textContent = '⏳ Loading...';
   previewVoiceBtn.disabled = true;
   try {
-    const audio = await puter.ai.txt2speech(
-      "Hi! I'm your language teacher. Nice to meet you!",
-      voice
-    );
-    if (audio instanceof HTMLAudioElement || audio.play) {
-      audio.play();
-    } else if (audio instanceof Blob) {
-      const url = URL.createObjectURL(audio);
-      const a = new Audio(url);
-      a.play();
-    }
+    await playTTS("Hi! I'm your language teacher. Nice to meet you!", voice);
     previewVoiceBtn.textContent = '▶️ Preview';
     previewVoiceBtn.disabled = false;
   } catch (err) {
-    console.error(err);
+    console.error('Preview error:', err);
     previewVoiceBtn.textContent = '❌ Error';
     setTimeout(() => {
       previewVoiceBtn.textContent = '▶️ Preview';
@@ -947,7 +928,6 @@ previewVoiceBtn.addEventListener('click', async () => {
   }
 });
 
-// ============ STATUS ============
 function setStatus(text, active = false) {
   statusEl.textContent = text;
   statusEl.classList.toggle('active', active);
@@ -1017,7 +997,6 @@ character.addEventListener('click', () => {
 async function handleUserInput(text) {
   if (!text.trim()) return;
   
-  // Tambah ke history
   state.history.push({ role: 'user', text: text });
   updateHistoryBadge();
   
@@ -1027,13 +1006,11 @@ async function handleUserInput(text) {
   try {
     const reply = await callAI(text);
     
-    // Tambah ke history
     state.history.push({ role: 'ai', text: reply.text, translation: reply.translation });
     updateHistoryBadge();
     
-    // Tampilkan di speech bubble
     setExpression('speaking', reply.text, reply.translation);
-    speak(reply.text);
+    await speak(reply.text);
   } catch (err) {
     console.error(err);
     setExpression('idle', 'Yah error 😵');
@@ -1103,7 +1080,65 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
   }
 }
 
-// ============ TTS NATURAL ============
+// ============ TTS - FIXED VERSION ============
+async function playTTS(text, voice) {
+  console.log('🔊 TTS called with:', { text: text.substring(0, 50), voice });
+  
+  try {
+    // Call Puter TTS
+    const audioResult = await puter.ai.txt2speech(text, voice);
+    console.log('🔊 Puter TTS result type:', typeof audioResult, audioResult);
+    
+    let audioElement;
+    
+    // Handle different return types
+    if (audioResult instanceof HTMLAudioElement) {
+      // Already an audio element
+      audioElement = audioResult;
+    } else if (audioResult && typeof audioResult === 'object' && audioResult.play) {
+      // Object with play method
+      audioElement = audioResult;
+    } else if (audioResult instanceof Blob) {
+      // Blob - create object URL
+      const url = URL.createObjectURL(audioResult);
+      audioElement = new Audio(url);
+    } else if (typeof audioResult === 'string') {
+      // String URL
+      audioElement = new Audio(audioResult);
+    } else {
+      throw new Error('Unknown TTS return type: ' + typeof audioResult);
+    }
+    
+    // Wait for audio to be ready
+    return new Promise((resolve, reject) => {
+      audioElement.onended = () => {
+        console.log('🔊 Audio ended');
+        resolve();
+      };
+      
+      audioElement.onerror = (e) => {
+        console.error('🔊 Audio error:', e);
+        reject(new Error('Audio playback failed'));
+      };
+      
+      // Try to play
+      audioElement.play().then(() => {
+        console.log('🔊 Audio playing');
+      }).catch(err => {
+        console.error('🔊 Play failed:', err);
+        reject(err);
+      });
+      
+      // Store reference
+      state.currentAudio = audioElement;
+    });
+    
+  } catch (err) {
+    console.error('🔊 TTS error:', err);
+    throw err;
+  }
+}
+
 async function speak(text) {
   const cleanText = text
     .replace(/[\u{1F600}-\u{1F64F}]/gu, '')
@@ -1124,31 +1159,62 @@ async function speak(text) {
   setStatus('🔊 Guru lagi ngomong...', true);
 
   try {
-    const audio = await puter.ai.txt2speech(cleanText, state.voice);
-    state.currentAudio = audio;
-
-    audio.onended = () => {
-      state.isSpeaking = false;
-      state.currentAudio = null;
-      setExpression('happy', 'Giliranmu! 👆');
-      setStatus('Klik guru buat ngobrol lagi');
-    };
-
-    audio.onerror = () => {
-      state.isSpeaking = false;
-      state.currentAudio = null;
-      setExpression('idle', 'Suara error 😵');
-      setStatus('TTS error. Coba lagi.');
-    };
-
-    await audio.play();
-  } catch (err) {
-    console.error('TTS error:', err);
+    await playTTS(cleanText, state.voice);
+    
     state.isSpeaking = false;
     state.currentAudio = null;
-    setExpression('idle', 'Yah 😵');
-    setStatus('TTS error: ' + (err.message || 'gagal'));
+    setExpression('happy', 'Giliranmu! 👆');
+    setStatus('Klik guru buat ngobrol lagi');
+  } catch (err) {
+    console.error('Speak error:', err);
+    state.isSpeaking = false;
+    state.currentAudio = null;
+    
+    // Fallback ke Web Speech API
+    console.log('🔊 Trying fallback to Web Speech API...');
+    try {
+      speakFallback(cleanText);
+    } catch (fallbackErr) {
+      console.error('Fallback also failed:', fallbackErr);
+      setExpression('idle', 'Suara error 😵');
+      setStatus('TTS error. Coba lagi.');
+    }
   }
+}
+
+// Fallback TTS using Web Speech API
+function speakFallback(text) {
+  if (!('speechSynthesis' in window)) {
+    throw new Error('Web Speech API not supported');
+  }
+  
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  
+  const langMap = { 'English': 'en-US', 'Indonesian': 'id-ID', 'Japanese': 'ja-JP', 'Korean': 'ko-KR', 'Spanish': 'es-ES' };
+  utter.lang = langMap[state.targetLang] || 'en-US';
+  utter.rate = 1;
+  utter.pitch = 1;
+
+  utter.onstart = () => {
+    console.log('🔊 Fallback TTS started');
+  };
+
+  utter.onend = () => {
+    console.log('🔊 Fallback TTS ended');
+    state.isSpeaking = false;
+    setExpression('happy', 'Giliranmu! 👆');
+    setStatus('Klik guru buat ngobrol lagi');
+  };
+
+  utter.onerror = () => {
+    console.error('🔊 Fallback TTS error');
+    state.isSpeaking = false;
+    setExpression('idle', 'Suara error 😵');
+    setStatus('TTS error. Coba lagi.');
+  };
+
+  speechSynthesis.speak(utter);
 }
 
 function stopSpeaking() {
@@ -1159,6 +1225,7 @@ function stopSpeaking() {
     } catch(e) {}
     state.currentAudio = null;
   }
+  speechSynthesis.cancel();
   state.isSpeaking = false;
   setExpression('idle');
   setStatus('Diberhentikan. Klik lagi buat ngobrol.');
