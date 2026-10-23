@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Guru Bahasa — AI Voice Ngobrol Santai</title>
+<script src="https://js.puter.com/v2/"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -17,6 +18,7 @@
     --skin-dark: #e8b890;
     --hat: #1f2937;
     --hat-gold: #fbbf24;
+    --free: #10b981;
   }
   html, body {
     height: 100%;
@@ -47,6 +49,18 @@
   .title-wrap { display: flex; align-items: center; gap: 12px; }
   .title h1 { font-size: 18px; font-weight: 700; }
   .title p { font-size: 12px; color: var(--muted); }
+  .free-badge {
+    display: inline-block;
+    background: var(--free);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    letter-spacing: .5px;
+    vertical-align: middle;
+  }
   .icon-btn {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.1);
@@ -72,7 +86,6 @@
     overflow: hidden;
   }
 
-  /* Floating particles */
   .particle {
     position: absolute;
     width: 6px; height: 6px;
@@ -87,7 +100,6 @@
     100% { transform: translateY(-100px) scale(1); opacity: 0; }
   }
 
-  /* Speech bubble */
   .speech-bubble {
     position: absolute;
     top: 20px;
@@ -123,7 +135,6 @@
     border-bottom-right-radius: 3px;
   }
 
-  /* Status pill */
   .status-pill {
     position: absolute;
     bottom: 12px;
@@ -146,7 +157,6 @@
     box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
   }
 
-  /* Character container - CLICKABLE */
   .character {
     position: relative;
     width: 240px;
@@ -157,18 +167,13 @@
     user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .character:hover {
-    transform: scale(1.03);
-  }
-  .character:active {
-    transform: scale(0.97);
-  }
+  .character:hover { transform: scale(1.03); }
+  .character:active { transform: scale(0.97); }
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
   }
 
-  /* Shadow */
   .shadow {
     position: absolute;
     bottom: 0;
@@ -184,7 +189,6 @@
     50% { transform: translateX(-50%) scale(0.85); opacity: 0.3; }
   }
 
-  /* Head wrap */
   .head-wrap {
     position: absolute;
     top: 20px;
@@ -195,7 +199,6 @@
     transition: transform .3s;
   }
 
-  /* Hat (topi toga) */
   .hat {
     position: absolute;
     top: 0;
@@ -247,7 +250,6 @@
     50% { transform: rotate(10deg); }
   }
 
-  /* Face */
   .face {
     position: absolute;
     top: 36px;
@@ -261,7 +263,6 @@
     z-index: 2;
   }
 
-  /* Glasses */
   .glasses {
     position: absolute;
     top: 54px;
@@ -293,7 +294,6 @@
     background: #1f2937;
   }
 
-  /* Eyes */
   .eyes {
     position: absolute;
     top: 68px;
@@ -335,16 +335,12 @@
     border-radius: 50%;
   }
 
-  /* Blink animation */
-  .character.idle .eye {
-    animation: blink 4s infinite;
-  }
+  .character.idle .eye { animation: blink 4s infinite; }
   @keyframes blink {
     0%, 92%, 100% { transform: scaleY(1); }
     95% { transform: scaleY(0.1); }
   }
 
-  /* Cheeks */
   .cheek {
     position: absolute;
     top: 108px;
@@ -359,7 +355,6 @@
   .cheek.left { left: 24px; }
   .cheek.right { right: 24px; }
 
-  /* Mouth */
   .mouth {
     position: absolute;
     top: 130px;
@@ -373,7 +368,6 @@
     transition: all .2s;
   }
 
-  /* Bowtie */
   .bowtie {
     position: absolute;
     top: 196px;
@@ -407,67 +401,43 @@
   }
 
   /* ============ EXPRESSIONS ============ */
-  /* Listening - mata melotot, mulut O */
-  .character.listening {
-    animation: shake 0.4s ease-in-out infinite !important;
-  }
+  .character.listening { animation: shake 0.4s ease-in-out infinite !important; }
   @keyframes shake {
     0%, 100% { transform: translateY(0) rotate(0); }
     25% { transform: translateY(-4px) rotate(-3deg); }
     75% { transform: translateY(-4px) rotate(3deg); }
   }
-  .character.listening .eye {
-    width: 28px;
-    height: 28px;
-    animation: none;
-  }
-  .character.listening .pupil {
-    width: 8px;
-    height: 8px;
-  }
+  .character.listening .eye { width: 28px; height: 28px; animation: none; }
+  .character.listening .pupil { width: 8px; height: 8px; }
   .character.listening .mouth {
-    width: 18px;
-    height: 18px;
+    width: 18px; height: 18px;
     border-radius: 50%;
     background: #7c2d12;
   }
 
-  /* Thinking - mata liat atas, mulut miring */
-  .character.thinking .head-wrap {
-    animation: tilt 2s ease-in-out infinite;
-  }
+  .character.thinking .head-wrap { animation: tilt 2s ease-in-out infinite; }
   @keyframes tilt {
     0%, 100% { transform: translateX(-50%) rotate(-5deg); }
     50% { transform: translateX(-50%) rotate(5deg); }
   }
-  .character.thinking .pupil {
-    top: 20%;
-    transform: translateX(-50%);
-  }
+  .character.thinking .pupil { top: 20%; transform: translateX(-50%); }
   .character.thinking .mouth {
-    width: 24px;
-    height: 8px;
+    width: 24px; height: 8px;
     border-radius: 0 0 10px 10px;
     transform: translateX(-50%) rotate(-10deg);
   }
 
-  /* Speaking - mulut buka-tutup */
-  .character.speaking .head-wrap {
-    animation: bounce 0.5s ease-in-out infinite;
-  }
+  .character.speaking .head-wrap { animation: bounce 0.5s ease-in-out infinite; }
   @keyframes bounce {
     0%, 100% { transform: translateX(-50%) translateY(0); }
     50% { transform: translateX(-50%) translateY(-6px); }
   }
-  .character.speaking .mouth {
-    animation: talk 0.3s ease-in-out infinite;
-  }
+  .character.speaking .mouth { animation: talk 0.3s ease-in-out infinite; }
   @keyframes talk {
     0%, 100% { height: 10px; width: 26px; border-radius: 0 0 20px 20px; }
     50% { height: 22px; width: 20px; border-radius: 50%; }
   }
 
-  /* Happy - mata ^^, mulut lebar */
   .character.happy .eye {
     height: 8px;
     border-radius: 10px 10px 0 0;
@@ -558,7 +528,6 @@
   .welcome h3 { color: var(--text); font-size: 16px; margin-bottom: 6px; }
   .welcome p { font-size: 13px; line-height: 1.6; }
 
-  /* Modal */
   .modal-bg {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.7);
@@ -609,6 +578,16 @@
   .btn:hover { transform: translateY(-1px); }
   .hint { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
   .hint a { color: var(--accent); }
+  .free-info {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--free);
+    line-height: 1.5;
+  }
 </style>
 </head>
 <body>
@@ -616,56 +595,39 @@
 <header>
   <div class="title-wrap">
     <div class="title">
-      <h1>🎓 Guru Bahasa</h1>
+      <h1>🎓 Guru Bahasa <span class="free-badge">100% GRATIS</span></h1>
       <p id="subtitle">Klik guru buat ngobrol!</p>
     </div>
   </div>
   <button class="icon-btn" id="settingsBtn" title="Pengaturan">⚙️</button>
 </header>
 
-<!-- CHARACTER STAGE -->
 <div class="stage">
-  <!-- Particles -->
   <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
   <div class="particle" style="left: 30%; animation-delay: 1.5s;"></div>
   <div class="particle" style="left: 70%; animation-delay: 3s;"></div>
   <div class="particle" style="left: 85%; animation-delay: 4.5s;"></div>
 
-  <!-- Speech bubble -->
   <div class="speech-bubble" id="speechBubble">Halo! 👋</div>
-
-  <!-- Status pill -->
   <div class="status-pill" id="status">Klik aku buat mulai ngobrol</div>
 
-  <!-- Character - CLICKABLE -->
   <div class="character idle" id="character" title="Klik untuk bicara">
     <div class="head-wrap">
-      <!-- Hat -->
-      <div class="hat">
-        <div class="tassel"></div>
-      </div>
-      <!-- Face -->
+      <div class="hat"><div class="tassel"></div></div>
       <div class="face">
-        <!-- Glasses -->
         <div class="glasses">
           <div class="lens left"></div>
           <div class="lens right"></div>
         </div>
-        <!-- Eyes -->
         <div class="eyes">
           <div class="eye"><div class="pupil"></div></div>
           <div class="eye"><div class="pupil"></div></div>
         </div>
-        <!-- Cheeks -->
         <div class="cheek left"></div>
         <div class="cheek right"></div>
-        <!-- Mouth -->
         <div class="mouth"></div>
       </div>
-      <!-- Bowtie -->
-      <div class="bowtie">
-        <div class="bowtie-center"></div>
-      </div>
+      <div class="bowtie"><div class="bowtie-center"></div></div>
     </div>
     <div class="shadow"></div>
   </div>
@@ -674,14 +636,14 @@
 <main id="chat">
   <div class="welcome" id="welcome">
     <h3>Halo! Aku guru bahasamu 👋</h3>
-    <p>Klik guru di atas buat mulai ngobrol. Kita latihan bahasa santai bareng!</p>
+    <p>Klik guru di atas buat mulai ngobrol. 100% gratis, no API key, no credit card!</p>
   </div>
 </main>
 
-<!-- Settings Modal -->
 <div class="modal-bg" id="modal">
   <div class="modal">
     <h2>⚙️ Pengaturan</h2>
+
     <label>Bahasa Target</label>
     <select id="targetLang">
       <option value="English">🇬🇧 English (Inggris)</option>
@@ -691,17 +653,12 @@
       <option value="Spanish">🇪🇸 Spanish (Spanyol)</option>
     </select>
 
-    <label>OpenAI API Key</label>
-    <input type="password" id="apiKey" placeholder="sk-..." />
-    <div class="hint">
-      Dapatkan di <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>. Key disimpan lokal di browser.
-    </div>
-
-    <label>Model</label>
+    <label>Model AI (semua GRATIS!)</label>
     <select id="model">
-      <option value="gpt-4o-mini">gpt-4o-mini (cepat & hemat)</option>
-      <option value="gpt-4o">gpt-4o (lebih pinter)</option>
-      <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+      <option value="gpt-4o-mini">🚀 GPT-4o Mini (cepat, rekomendasi)</option>
+      <option value="gpt-4o">💎 GPT-4o (lebih pinter)</option>
+      <option value="claude-sonnet">🤖 Claude Sonnet</option>
+      <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash</option>
     </select>
 
     <label>Suara AI (TTS)</label>
@@ -710,6 +667,10 @@
 
     <label>Kecepatan Bicara</label>
     <input type="range" id="rate" min="0.5" max="1.5" step="0.1" value="1" />
+
+    <div class="free-info">
+      💚 <strong>Gratis total!</strong> Pakai Puter.js, jadi gak butuh API key atau credit card sama sekali. Semua model AI di atas bisa dipakai gratis.
+    </div>
 
     <div class="modal-actions">
       <button class="btn btn-secondary" id="cancelBtn">Batal</button>
@@ -722,7 +683,6 @@
 // ============ STATE ============
 const state = {
   targetLang: localStorage.getItem('gb_targetLang') || 'English',
-  apiKey: localStorage.getItem('gb_apiKey') || '',
   model: localStorage.getItem('gb_model') || 'gpt-4o-mini',
   rate: parseFloat(localStorage.getItem('gb_rate') || '1'),
   voiceURI: localStorage.getItem('gb_voiceURI') || '',
@@ -740,7 +700,6 @@ const modal = document.getElementById('modal');
 const settingsBtn = document.getElementById('settingsBtn');
 const saveBtn = document.getElementById('saveBtn');
 const cancelBtn = document.getElementById('cancelBtn');
-const apiKeyInput = document.getElementById('apiKey');
 const targetLangSelect = document.getElementById('targetLang');
 const modelSelect = document.getElementById('model');
 const voiceSelect = document.getElementById('voiceSelect');
@@ -773,12 +732,6 @@ function init() {
     speechSynthesis.onvoiceschanged = loadVoices;
   }
   setExpression('idle', 'Halo! 👋');
-  if (!state.apiKey) {
-    setTimeout(() => {
-      setExpression('thinking', 'API key dulu ya! ⚙️');
-      addSystemMessage("Hei! Sebelum mulai, atur dulu API key OpenAI kamu ya. Tekan ⚙️ di pojok kanan atas.");
-    }, 1500);
-  }
 }
 
 function updateSubtitle() {
@@ -819,7 +772,6 @@ function getSelectedVoice() {
 
 // ============ MODAL ============
 settingsBtn.addEventListener('click', () => {
-  apiKeyInput.value = state.apiKey;
   targetLangSelect.value = state.targetLang;
   modelSelect.value = state.model;
   rateInput.value = state.rate;
@@ -827,12 +779,10 @@ settingsBtn.addEventListener('click', () => {
 });
 cancelBtn.addEventListener('click', () => modal.classList.remove('show'));
 saveBtn.addEventListener('click', () => {
-  state.apiKey = apiKeyInput.value.trim();
   state.targetLang = targetLangSelect.value;
   state.model = modelSelect.value;
   state.rate = parseFloat(rateInput.value);
   state.voiceURI = voiceSelect.value;
-  localStorage.setItem('gb_apiKey', state.apiKey);
   localStorage.setItem('gb_targetLang', state.targetLang);
   localStorage.setItem('gb_model', state.model);
   localStorage.setItem('gb_rate', state.rate);
@@ -956,21 +906,18 @@ function stopListening() {
   try { recognition.stop(); } catch(e) {}
 }
 
-// ============ CHARACTER CLICK HANDLER ============
+// ============ CHARACTER CLICK ============
 character.addEventListener('click', () => {
   if (state.isListening) {
-    // Stop listening
     stopListening();
     setExpression('idle');
     setStatus('Diberhentikan. Klik lagi buat ngobrol.');
   } else if (state.isSpeaking) {
-    // Stop speaking
     speechSynthesis.cancel();
     state.isSpeaking = false;
     setExpression('idle');
     setStatus('Diberhentikan. Klik lagi buat ngobrol.');
   } else {
-    // Start listening
     startListening();
   }
 });
@@ -979,16 +926,11 @@ character.addEventListener('click', () => {
 async function handleUserInput(text) {
   if (!text.trim()) return;
   addMessage('user', text);
-  if (!state.apiKey) {
-    setStatus('API key belum diisi. Tekan ⚙️ buat atur.');
-    setExpression('thinking', 'API key? ⚙️');
-    return;
-  }
   addTyping();
   setExpression('thinking', 'Hmm... 🤔');
   setStatus('🤔 Guru lagi mikir...', true);
   try {
-    const reply = await callGPT(text);
+    const reply = await callAI(text);
     removeTyping();
     addMessage('ai', reply.text, reply.translation);
     speak(reply.text);
@@ -1001,7 +943,8 @@ async function handleUserInput(text) {
   }
 }
 
-async function callGPT(userText) {
+// ============ AI CALL VIA PUTER.JS (GRATIS!) ============
+async function callAI(userText) {
   const systemPrompt = `Kamu adalah "Guru Bahasa", teman ngobrol yang santai, asyik, dan lucu. Gaya bicaramu kayak teman nongkrong di coffee shop — pakai bahasa gaul tapi tetap sopan, sesekali pakai emoji, dan suka ngeledek tipis-tipis.
 
 Bahasa target yang sedang dipelajari user: ${state.targetLang}.
@@ -1016,8 +959,10 @@ ATURAN PENTING:
 
 User bilang: "${userText}"
 
-Balas dalam format JSON persis seperti ini (JANGAN pakai markdown, JANGAN pakai code block):
-{"text": "jawaban kamu dalam ${state.targetLang}", "translation": "terjemahan bahasa Indonesia dari jawaban kamu"}`;
+Balas dalam format JSON persis seperti ini:
+{"text": "jawaban kamu dalam ${state.targetLang}", "translation": "terjemahan bahasa Indonesia dari jawaban kamu"}
+
+PENTING: Output HANYA JSON, jangan ada teks lain di luar JSON, jangan pakai markdown, jangan pakai code block.`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -1025,41 +970,41 @@ Balas dalam format JSON persis seperti ini (JANGAN pakai markdown, JANGAN pakai 
     { role: 'user', content: userText }
   ];
 
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` },
-    body: JSON.stringify({
+  try {
+    // Pakai Puter.js AI - GRATIS, tanpa API key!
+    const response = await puter.ai.chat(messages, {
       model: state.model,
-      messages: messages,
-      temperature: 0.8,
-      response_format: { type: 'json_object' }
-    })
-  });
+      temperature: 0.8
+    });
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`API error ${res.status}: ${err.slice(0, 200)}`);
+    const content = typeof response === 'string' ? response : response.message?.content || response.text || '';
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (e) {
+      // Coba extract JSON dari response
+      const match = content.match(/\{[\s\S]*\}/);
+      if (match) {
+        try { parsed = JSON.parse(match[0]); }
+        catch (e2) { throw new Error('Response bukan JSON valid'); }
+      } else {
+        // Fallback: anggap seluruh content sebagai text
+        parsed = { text: content.trim(), translation: '' };
+      }
+    }
+
+    state.history.push({ role: 'user', content: userText });
+    state.history.push({ role: 'assistant', content: parsed.text || content });
+    if (state.history.length > 20) state.history = state.history.slice(-20);
+
+    return {
+      text: parsed.text || 'Hmm, coba ulang ya?',
+      translation: parsed.translation || ''
+    };
+  } catch (err) {
+    throw new Error(err.message || 'Gagal connect ke AI');
   }
-
-  const data = await res.json();
-  const content = data.choices[0].message.content;
-
-  let parsed;
-  try { parsed = JSON.parse(content); }
-  catch (e) {
-    const match = content.match(/\{[\s\S]*\}/);
-    if (match) parsed = JSON.parse(match[0]);
-    else throw new Error('Response bukan JSON valid');
-  }
-
-  state.history.push({ role: 'user', content: userText });
-  state.history.push({ role: 'assistant', content: parsed.text || content });
-  if (state.history.length > 20) state.history = state.history.slice(-20);
-
-  return {
-    text: parsed.text || 'Hmm, coba ulang ya?',
-    translation: parsed.translation || ''
-  };
 }
 
 // ============ TTS ============
