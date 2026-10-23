@@ -37,11 +37,13 @@
   }
 
   header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
     padding: 12px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255,255,255,0.08);
     z-index: 10;
@@ -74,15 +76,14 @@
   }
   .icon-btn:hover { background: rgba(255,255,255,0.12); }
 
-  /* ============ CHARACTER STAGE ============ */
+  /* ============ FULL CHARACTER STAGE ============ */
   .stage {
     position: relative;
-    height: 320px;
-    flex-shrink: 0;
+    flex: 1;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    background: radial-gradient(ellipse at center bottom, rgba(34, 211, 238, 0.12) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.08) 0%, transparent 60%);
     overflow: hidden;
   }
 
@@ -100,50 +101,63 @@
     100% { transform: translateY(-100px) scale(1); opacity: 0; }
   }
 
+  /* Speech bubble - lebih besar */
   .speech-bubble {
     position: absolute;
-    top: 20px;
-    right: 30px;
+    top: 80px;
+    right: 20px;
     background: white;
     color: #1f2937;
-    padding: 10px 14px;
-    border-radius: 18px;
+    padding: 14px 18px;
+    border-radius: 20px;
     border-bottom-right-radius: 4px;
-    font-size: 13px;
-    font-weight: 600;
-    max-width: 160px;
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 240px;
+    min-width: 120px;
     opacity: 0;
     transform: scale(0.5);
     transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
     pointer-events: none;
     z-index: 20;
+    line-height: 1.5;
+    word-wrap: break-word;
   }
   .speech-bubble.show { opacity: 1; transform: scale(1); }
   .speech-bubble::after {
     content: '';
     position: absolute;
-    bottom: -6px;
-    right: 20px;
-    width: 12px;
-    height: 12px;
+    bottom: -8px;
+    right: 24px;
+    width: 14px;
+    height: 14px;
     background: white;
     transform: rotate(45deg);
     border-bottom-right-radius: 3px;
   }
+  .speech-bubble .translation {
+    display: block;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(0,0,0,0.15);
+    font-size: 12px;
+    color: #64748b;
+    font-style: italic;
+  }
 
   .status-pill {
     position: absolute;
-    bottom: 12px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.1);
     color: var(--muted);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 8px 18px;
+    border-radius: 24px;
+    font-size: 13px;
     z-index: 15;
     transition: all .3s;
     white-space: nowrap;
@@ -154,10 +168,41 @@
     box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
   }
 
+  /* History button */
+  .history-btn {
+    position: absolute;
+    bottom: 24px;
+    right: 20px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: all .2s;
+    z-index: 15;
+  }
+  .history-btn:hover { background: rgba(15, 23, 42, 0.95); transform: scale(1.05); }
+  .history-btn .badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--accent);
+    color: var(--bg1);
+    font-size: 10px;
+    font-weight: 700;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
   .character {
     position: relative;
-    width: 240px;
-    height: 290px;
+    width: 280px;
+    height: 340px;
     animation: float 3s ease-in-out infinite;
     cursor: pointer;
     transition: transform .2s;
@@ -168,7 +213,7 @@
   .character:active { transform: scale(0.97); }
   @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-10px); }
   }
 
   .shadow {
@@ -176,8 +221,8 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 140px;
-    height: 18px;
+    width: 160px;
+    height: 20px;
     background: radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%);
     animation: shadowPulse 3s ease-in-out infinite;
   }
@@ -191,8 +236,8 @@
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 180px;
-    height: 210px;
+    width: 210px;
+    height: 245px;
     transition: transform .3s;
   }
 
@@ -201,8 +246,8 @@
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 170px;
-    height: 38px;
+    width: 200px;
+    height: 44px;
     background: var(--hat);
     border-radius: 6px;
     z-index: 3;
@@ -211,34 +256,34 @@
   .hat::before {
     content: '';
     position: absolute;
-    top: -22px;
+    top: -26px;
     left: 50%;
     transform: translateX(-50%);
-    width: 78px;
-    height: 28px;
+    width: 92px;
+    height: 32px;
     background: var(--hat);
     border-radius: 4px 4px 2px 2px;
   }
   .tassel {
     position: absolute;
-    top: -18px;
-    right: -8px;
-    width: 18px;
-    height: 18px;
+    top: -22px;
+    right: -10px;
+    width: 22px;
+    height: 22px;
     background: var(--hat-gold);
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
     animation: tasselSwing 2s ease-in-out infinite;
     transform-origin: top center;
   }
   .tassel::after {
     content: '';
     position: absolute;
-    top: 14px;
+    top: 16px;
     left: 50%;
     transform: translateX(-50%);
-    width: 4px;
-    height: 18px;
+    width: 5px;
+    height: 22px;
     background: var(--hat-gold);
     border-radius: 2px;
   }
@@ -249,11 +294,11 @@
 
   .face {
     position: absolute;
-    top: 36px;
+    top: 42px;
     left: 50%;
     transform: translateX(-50%);
-    width: 156px;
-    height: 156px;
+    width: 182px;
+    height: 182px;
     background: radial-gradient(circle at 35% 35%, #fde4c7, var(--skin) 60%, var(--skin-dark));
     border-radius: 50%;
     box-shadow: inset -4px -6px 12px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.2);
@@ -262,18 +307,18 @@
 
   .glasses {
     position: absolute;
-    top: 54px;
+    top: 62px;
     left: 50%;
     transform: translateX(-50%);
-    width: 124px;
-    height: 42px;
+    width: 144px;
+    height: 48px;
     z-index: 4;
   }
   .lens {
     position: absolute;
     top: 0;
-    width: 44px;
-    height: 42px;
+    width: 52px;
+    height: 48px;
     border: 4px solid #1f2937;
     border-radius: 50%;
     background: rgba(255,255,255,0.1);
@@ -283,27 +328,27 @@
   .glasses::before {
     content: '';
     position: absolute;
-    top: 18px;
+    top: 22px;
     left: 50%;
     transform: translateX(-50%);
-    width: 16px;
+    width: 18px;
     height: 4px;
     background: #1f2937;
   }
 
   .eyes {
     position: absolute;
-    top: 68px;
+    top: 78px;
     left: 50%;
     transform: translateX(-50%);
-    width: 104px;
+    width: 120px;
     display: flex;
     justify-content: space-between;
     z-index: 5;
   }
   .eye {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     background: white;
     border-radius: 50%;
     position: relative;
@@ -315,8 +360,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     background: #1f2937;
     border-radius: 50%;
     transition: all .3s;
@@ -324,10 +369,10 @@
   .pupil::after {
     content: '';
     position: absolute;
-    top: 1px;
-    right: 1px;
-    width: 4px;
-    height: 4px;
+    top: 2px;
+    right: 2px;
+    width: 5px;
+    height: 5px;
     background: white;
     border-radius: 50%;
   }
@@ -340,25 +385,25 @@
 
   .cheek {
     position: absolute;
-    top: 108px;
-    width: 20px;
-    height: 13px;
+    top: 126px;
+    width: 24px;
+    height: 15px;
     background: #f9a8a8;
     border-radius: 50%;
     opacity: 0.6;
     z-index: 3;
     filter: blur(1px);
   }
-  .cheek.left { left: 24px; }
-  .cheek.right { right: 24px; }
+  .cheek.left { left: 28px; }
+  .cheek.right { right: 28px; }
 
   .mouth {
     position: absolute;
-    top: 130px;
+    top: 152px;
     left: 50%;
     transform: translateX(-50%);
-    width: 28px;
-    height: 13px;
+    width: 32px;
+    height: 15px;
     background: #7c2d12;
     border-radius: 0 0 20px 20px;
     z-index: 4;
@@ -367,19 +412,19 @@
 
   .bowtie {
     position: absolute;
-    top: 196px;
+    top: 228px;
     left: 50%;
     transform: translateX(-50%);
-    width: 52px;
-    height: 24px;
+    width: 60px;
+    height: 28px;
     z-index: 3;
   }
   .bowtie::before, .bowtie::after {
     content: '';
     position: absolute;
     top: 0;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     background: linear-gradient(135deg, #ef4444, #b91c1c);
     border-radius: 4px;
   }
@@ -387,11 +432,11 @@
   .bowtie::after { right: 0; transform: rotate(45deg); }
   .bowtie-center {
     position: absolute;
-    top: 6px;
+    top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 10px;
-    height: 12px;
+    width: 12px;
+    height: 14px;
     background: #991b1b;
     border-radius: 2px;
     z-index: 1;
@@ -404,10 +449,10 @@
     25% { transform: translateY(-4px) rotate(-3deg); }
     75% { transform: translateY(-4px) rotate(3deg); }
   }
-  .character.listening .eye { width: 28px; height: 28px; animation: none; }
-  .character.listening .pupil { width: 8px; height: 8px; }
+  .character.listening .eye { width: 32px; height: 32px; animation: none; }
+  .character.listening .pupil { width: 10px; height: 10px; }
   .character.listening .mouth {
-    width: 18px; height: 18px;
+    width: 22px; height: 22px;
     border-radius: 50%;
     background: #7c2d12;
   }
@@ -419,7 +464,7 @@
   }
   .character.thinking .pupil { top: 20%; transform: translateX(-50%); }
   .character.thinking .mouth {
-    width: 24px; height: 8px;
+    width: 28px; height: 10px;
     border-radius: 0 0 10px 10px;
     transform: translateX(-50%) rotate(-10deg);
   }
@@ -431,100 +476,24 @@
   }
   .character.speaking .mouth { animation: talk 0.3s ease-in-out infinite; }
   @keyframes talk {
-    0%, 100% { height: 10px; width: 26px; border-radius: 0 0 20px 20px; }
-    50% { height: 22px; width: 20px; border-radius: 50%; }
+    0%, 100% { height: 12px; width: 30px; border-radius: 0 0 20px 20px; }
+    50% { height: 26px; width: 24px; border-radius: 50%; }
   }
 
   .character.happy .eye {
-    height: 8px;
+    height: 10px;
     border-radius: 10px 10px 0 0;
     background: #1f2937;
     animation: none;
   }
   .character.happy .pupil { display: none; }
   .character.happy .mouth {
-    width: 40px;
-    height: 18px;
+    width: 48px;
+    height: 22px;
     border-radius: 0 0 30px 30px;
   }
 
-  /* ============ CHAT ============ */
-  main {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    scroll-behavior: smooth;
-  }
-  main::-webkit-scrollbar { width: 6px; }
-  main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-
-  .msg { display: flex; margin-bottom: 12px; animation: slideIn .3s ease; }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .msg.user { justify-content: flex-end; }
-  .bubble {
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 18px;
-    font-size: 15px;
-    line-height: 1.5;
-    word-wrap: break-word;
-  }
-  .msg.user .bubble {
-    background: linear-gradient(135deg, #1e40af, #3b82f6);
-    color: white;
-    border-bottom-right-radius: 4px;
-  }
-  .msg.ai .bubble {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-bottom-left-radius: 4px;
-  }
-  .bubble .lang-tag {
-    display: inline-block;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    background: rgba(34,211,238,0.2);
-    color: var(--accent);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-  }
-  .bubble .translation {
-    display: block;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px dashed rgba(255,255,255,0.15);
-    font-size: 13px;
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  .typing { display: inline-flex; gap: 4px; padding: 4px 0; }
-  .typing span {
-    width: 7px; height: 7px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: bounceDot 1.4s infinite ease-in-out;
-  }
-  .typing span:nth-child(2) { animation-delay: .2s; }
-  .typing span:nth-child(3) { animation-delay: .4s; }
-  @keyframes bounceDot {
-    0%, 60%, 100% { transform: translateY(0); opacity: .5; }
-    30% { transform: translateY(-6px); opacity: 1; }
-  }
-
-  .welcome {
-    text-align: center;
-    padding: 20px;
-    color: var(--muted);
-  }
-  .welcome h3 { color: var(--text); font-size: 16px; margin-bottom: 6px; }
-  .welcome p { font-size: 13px; line-height: 1.6; }
-
+  /* ============ MODALS ============ */
   .modal-bg {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.7);
@@ -616,6 +585,65 @@
     transition: all .2s;
   }
   .preview-btn:hover { background: rgba(34, 211, 238, 0.35); }
+
+  /* History modal */
+  .history-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 4px;
+  }
+  .history-item {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .history-item.user {
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: white;
+    margin-left: 20px;
+  }
+  .history-item.ai {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-right: 20px;
+  }
+  .history-item .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    opacity: 0.7;
+    margin-bottom: 4px;
+  }
+  .history-item .translation {
+    display: block;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+    font-size: 12px;
+    opacity: 0.7;
+    font-style: italic;
+  }
+  .history-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .clear-history {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    width: 100%;
+    transition: all .2s;
+  }
+  .clear-history:hover { background: rgba(239, 68, 68, 0.25); }
 </style>
 </head>
 <body>
@@ -638,6 +666,10 @@
 
   <div class="speech-bubble" id="speechBubble">Halo! 👋</div>
   <div class="status-pill" id="status">Klik aku buat mulai ngobrol</div>
+  <button class="history-btn" id="historyBtn" title="Lihat riwayat chat">
+    💬
+    <span class="badge" id="historyBadge" style="display:none;">0</span>
+  </button>
 
   <div class="character idle" id="character" title="Klik untuk bicara">
     <div class="head-wrap">
@@ -661,13 +693,7 @@
   </div>
 </div>
 
-<main id="chat">
-  <div class="welcome" id="welcome">
-    <h3>Halo! Aku guru bahasamu 👋</h3>
-    <p>Klik guru di atas buat mulai ngobrol. Suara natural, 100% gratis!</p>
-  </div>
-</main>
-
+<!-- Settings Modal -->
 <div class="modal-bg" id="modal">
   <div class="modal">
     <h2>⚙️ Pengaturan</h2>
@@ -703,7 +729,7 @@
       <option value="shimmer">🎙️ Shimmer — manis, lembut</option>
     </select>
     <div class="hint">
-      💚 Suara dari OpenAI TTS — natural banget, gak kayak robot! Klik "Simpan" terus coba dengerin.
+      💚 Suara dari OpenAI TTS — natural banget, gak kayak robot!
     </div>
     <div class="voice-card">
       <span>🔊 Coba dengerin suaranya:</span>
@@ -711,12 +737,26 @@
     </div>
 
     <div class="free-info">
-      💚 <strong>Gratis total!</strong>
+      💚 <strong>Gratis total!</strong> Pakai Puter.js, jadi gak butuh API key atau credit card.
     </div>
 
     <div class="modal-actions">
       <button class="btn btn-secondary" id="cancelBtn">Batal</button>
       <button class="btn btn-primary" id="saveBtn">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div class="modal-bg" id="historyModal">
+  <div class="modal">
+    <h2>💬 Riwayat Obrolan</h2>
+    <div class="history-list" id="historyList">
+      <div class="history-empty">Belum ada obrolan. Klik guru buat mulai!</div>
+    </div>
+    <button class="clear-history" id="clearHistory">🗑️ Hapus Semua Riwayat</button>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="closeHistory">Tutup</button>
     </div>
   </div>
 </div>
@@ -727,21 +767,26 @@ const state = {
   targetLang: localStorage.getItem('gb_targetLang') || 'English',
   model: localStorage.getItem('gb_model') || 'gpt-4o-mini',
   voice: localStorage.getItem('gb_voice') || 'nova',
-  history: [],
+  history: [], // {role, text, translation}
+  aiHistory: [], // untuk context AI
   isListening: false,
   isSpeaking: false,
   currentAudio: null,
 };
 
 // ============ ELEMENTS ============
-const chatEl = document.getElementById('chat');
-const welcomeEl = document.getElementById('welcome');
 const statusEl = document.getElementById('status');
 const subtitleEl = document.getElementById('subtitle');
 const modal = document.getElementById('modal');
+const historyModal = document.getElementById('historyModal');
+const historyList = document.getElementById('historyList');
+const historyBadge = document.getElementById('historyBadge');
 const settingsBtn = document.getElementById('settingsBtn');
+const historyBtn = document.getElementById('historyBtn');
 const saveBtn = document.getElementById('saveBtn');
 const cancelBtn = document.getElementById('cancelBtn');
+const closeHistory = document.getElementById('closeHistory');
+const clearHistory = document.getElementById('clearHistory');
 const previewVoiceBtn = document.getElementById('previewVoice');
 const targetLangSelect = document.getElementById('targetLang');
 const modelSelect = document.getElementById('model');
@@ -750,17 +795,31 @@ const character = document.getElementById('character');
 const speechBubble = document.getElementById('speechBubble');
 
 // ============ CHARACTER EXPRESSIONS ============
-function setExpression(expr, bubbleText = null) {
+let bubbleTimeout = null;
+function setExpression(expr, bubbleText = null, translation = null) {
   character.className = 'character ' + expr;
+  clearTimeout(bubbleTimeout);
+  
   if (bubbleText) {
-    speechBubble.textContent = bubbleText;
+    speechBubble.innerHTML = '';
+    const main = document.createElement('span');
+    main.textContent = bubbleText;
+    speechBubble.appendChild(main);
+    
+    if (translation) {
+      const tr = document.createElement('span');
+      tr.className = 'translation';
+      tr.textContent = '🇮🇩 ' + translation;
+      speechBubble.appendChild(tr);
+    }
+    
     speechBubble.classList.add('show');
-  } else if (expr === 'idle' || expr === 'happy') {
-    setTimeout(() => {
-      if (character.className.includes('idle') || character.className.includes('happy')) {
+    
+    if (expr === 'idle' || expr === 'happy') {
+      bubbleTimeout = setTimeout(() => {
         speechBubble.classList.remove('show');
-      }
-    }, 2000);
+      }, 4000);
+    }
   } else {
     speechBubble.classList.remove('show');
   }
@@ -771,6 +830,7 @@ function init() {
   updateSubtitle();
   voiceSelect.value = state.voice;
   setExpression('idle', 'Halo! 👋');
+  updateHistoryBadge();
 }
 
 function updateSubtitle() {
@@ -784,7 +844,7 @@ function updateSubtitle() {
   subtitleEl.textContent = map[state.targetLang] || 'Klik guru buat ngobrol!';
 }
 
-// ============ MODAL ============
+// ============ MODALS ============
 settingsBtn.addEventListener('click', () => {
   targetLangSelect.value = state.targetLang;
   modelSelect.value = state.model;
@@ -805,7 +865,60 @@ saveBtn.addEventListener('click', () => {
   setStatus('Pengaturan disimpan ✅');
 });
 
-// Preview voice button
+// History modal
+historyBtn.addEventListener('click', () => {
+  renderHistory();
+  historyModal.classList.add('show');
+});
+closeHistory.addEventListener('click', () => historyModal.classList.remove('show'));
+clearHistory.addEventListener('click', () => {
+  if (confirm('Hapus semua riwayat obrolan?')) {
+    state.history = [];
+    state.aiHistory = [];
+    updateHistoryBadge();
+    renderHistory();
+    setExpression('happy', 'Riwayat dihapus! 🧹');
+  }
+});
+
+function renderHistory() {
+  if (state.history.length === 0) {
+    historyList.innerHTML = '<div class="history-empty">Belum ada obrolan. Klik guru buat mulai!</div>';
+    return;
+  }
+  historyList.innerHTML = '';
+  state.history.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'history-item ' + item.role;
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = item.role === 'user' ? '👤 Kamu' : '🎓 Guru';
+    div.appendChild(label);
+    const text = document.createElement('div');
+    text.textContent = item.text;
+    div.appendChild(text);
+    if (item.translation) {
+      const tr = document.createElement('span');
+      tr.className = 'translation';
+      tr.textContent = '🇮🇩 ' + item.translation;
+      div.appendChild(tr);
+    }
+    historyList.appendChild(div);
+  });
+  historyList.scrollTop = historyList.scrollHeight;
+}
+
+function updateHistoryBadge() {
+  const count = state.history.length;
+  if (count > 0) {
+    historyBadge.textContent = count > 99 ? '99+' : count;
+    historyBadge.style.display = 'flex';
+  } else {
+    historyBadge.style.display = 'none';
+  }
+}
+
+// Preview voice
 previewVoiceBtn.addEventListener('click', async () => {
   const voice = voiceSelect.value;
   previewVoiceBtn.textContent = '⏳ Loading...';
@@ -815,7 +928,6 @@ previewVoiceBtn.addEventListener('click', async () => {
       "Hi! I'm your language teacher. Nice to meet you!",
       voice
     );
-    // puter.ai.txt2speech returns an Audio object directly
     if (audio instanceof HTMLAudioElement || audio.play) {
       audio.play();
     } else if (audio instanceof Blob) {
@@ -835,66 +947,7 @@ previewVoiceBtn.addEventListener('click', async () => {
   }
 });
 
-// ============ CHAT UI ============
-function hideWelcome() {
-  if (welcomeEl) welcomeEl.style.display = 'none';
-}
-
-function addMessage(role, text, translation = null) {
-  hideWelcome();
-  const msg = document.createElement('div');
-  msg.className = `msg ${role}`;
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  if (role === 'ai' && translation) {
-    const tag = document.createElement('span');
-    tag.className = 'lang-tag';
-    tag.textContent = state.targetLang;
-    bubble.appendChild(tag);
-    const main = document.createElement('span');
-    main.textContent = text;
-    bubble.appendChild(main);
-    const tr = document.createElement('span');
-    tr.className = 'translation';
-    tr.textContent = '🇮🇩 ' + translation;
-    bubble.appendChild(tr);
-  } else {
-    bubble.textContent = text;
-  }
-  msg.appendChild(bubble);
-  chatEl.appendChild(msg);
-  chatEl.scrollTop = chatEl.scrollHeight;
-}
-
-function addSystemMessage(text) {
-  hideWelcome();
-  const msg = document.createElement('div');
-  msg.className = 'msg ai';
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.textContent = text;
-  msg.appendChild(bubble);
-  chatEl.appendChild(msg);
-  chatEl.scrollTop = chatEl.scrollHeight;
-}
-
-function addTyping() {
-  hideWelcome();
-  const msg = document.createElement('div');
-  msg.className = 'msg ai';
-  msg.id = 'typing-msg';
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-  msg.appendChild(bubble);
-  chatEl.appendChild(msg);
-  chatEl.scrollTop = chatEl.scrollHeight;
-}
-function removeTyping() {
-  const t = document.getElementById('typing-msg');
-  if (t) t.remove();
-}
-
+// ============ STATUS ============
 function setStatus(text, active = false) {
   statusEl.textContent = text;
   statusEl.classList.toggle('active', active);
@@ -963,25 +1016,32 @@ character.addEventListener('click', () => {
 // ============ MAIN FLOW ============
 async function handleUserInput(text) {
   if (!text.trim()) return;
-  addMessage('user', text);
-  addTyping();
+  
+  // Tambah ke history
+  state.history.push({ role: 'user', text: text });
+  updateHistoryBadge();
+  
   setExpression('thinking', 'Hmm... 🤔');
   setStatus('🤔 Guru lagi mikir...', true);
+  
   try {
     const reply = await callAI(text);
-    removeTyping();
-    addMessage('ai', reply.text, reply.translation);
+    
+    // Tambah ke history
+    state.history.push({ role: 'ai', text: reply.text, translation: reply.translation });
+    updateHistoryBadge();
+    
+    // Tampilkan di speech bubble
+    setExpression('speaking', reply.text, reply.translation);
     speak(reply.text);
   } catch (err) {
-    removeTyping();
     console.error(err);
-    addSystemMessage('Ups, ada error: ' + err.message);
     setExpression('idle', 'Yah error 😵');
-    setStatus('Error. Klik lagi buat coba.');
+    setStatus('Error: ' + err.message);
   }
 }
 
-// ============ AI CALL VIA PUTER.JS (GRATIS!) ============
+// ============ AI CALL VIA PUTER.JS ============
 async function callAI(userText) {
   const systemPrompt = `Kamu adalah "Guru Bahasa", teman ngobrol yang santai, asyik, dan lucu. Gaya bicaramu kayak teman nongkrong di coffee shop — pakai bahasa gaul tapi tetap sopan, sesekali pakai emoji, dan suka ngeledek tipis-tipis.
 
@@ -994,7 +1054,7 @@ ATURAN PENTING:
 4. Sesekali ajak user ngobrol balik dengan pertanyaan ringan.
 5. Topik bebas: hobi, makanan, film, cuaca, kehidupan sehari-hari.
 6. Jangan pakai bahasa Indonesia sama sekali di jawaban utama.
-7. PENTING untuk TTS: Jangan pakai simbol seperti *, _, -, #, atau emoji di jawaban, karena akan diucapkan. Tulis natural seperti orang ngomong.
+7. PENTING untuk TTS: Jangan pakai simbol seperti *, _, -, # di jawaban. Tulis natural seperti orang ngomong.
 
 User bilang: "${userText}"
 
@@ -1005,7 +1065,7 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
-    ...state.history.slice(-10),
+    ...state.aiHistory.slice(-10),
     { role: 'user', content: userText }
   ];
 
@@ -1030,9 +1090,9 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
       }
     }
 
-    state.history.push({ role: 'user', content: userText });
-    state.history.push({ role: 'assistant', content: parsed.text || content });
-    if (state.history.length > 20) state.history = state.history.slice(-20);
+    state.aiHistory.push({ role: 'user', content: userText });
+    state.aiHistory.push({ role: 'assistant', content: parsed.text || content });
+    if (state.aiHistory.length > 20) state.aiHistory = state.aiHistory.slice(-20);
 
     return {
       text: parsed.text || 'Hmm, coba ulang ya?',
@@ -1043,9 +1103,8 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
   }
 }
 
-// ============ TTS NATURAL VIA PUTER.JS ============
+// ============ TTS NATURAL ============
 async function speak(text) {
-  // Bersihkan text dari emoji & simbol aneh biar TTS natural
   const cleanText = text
     .replace(/[\u{1F600}-\u{1F64F}]/gu, '')
     .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
@@ -1062,13 +1121,10 @@ async function speak(text) {
   }
 
   state.isSpeaking = true;
-  setExpression('speaking', 'Dengerin ya! 🗣️');
   setStatus('🔊 Guru lagi ngomong...', true);
 
   try {
-    // Puter.js TTS - natural, bukan robot!
     const audio = await puter.ai.txt2speech(cleanText, state.voice);
-
     state.currentAudio = audio;
 
     audio.onended = () => {
