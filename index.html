@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guru Bahasa — AI Voice Ngobrol Santai</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg1: #0f172a;
+    --bg2: #1e293b;
+    --accent: #22d3ee;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --user: #1e40af;
+    --ai: #0f766e;
+    --danger: #ef4444;
+  }
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    color: var(--text);
+    overflow: hidden;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+  }
+  header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    z-index: 10;
+  }
+  .title-wrap { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+  }
+  .title h1 { font-size: 18px; font-weight: 700; }
+  .title p { font-size: 12px; color: var(--muted); }
+  .icon-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .icon-btn:hover { background: rgba(255,255,255,0.12); }
+
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px;
+    scroll-behavior: smooth;
+  }
+  main::-webkit-scrollbar { width: 6px; }
+  main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+  .msg {
+    display: flex;
+    margin-bottom: 14px;
+    animation: slideIn .3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg.user { justify-content: flex-end; }
+  .bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    position: relative;
+  }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.ai .bubble {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-bottom-left-radius: 4px;
+  }
+  .bubble .lang-tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(34,211,238,0.2);
+    color: var(--accent);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .bubble .translation {
+    display: block;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px 0;
+  }
+  .typing span {
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: .5; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  footer {
+    padding: 12px 16px 20px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .mic-btn {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-size: 26px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all .2s;
+    box-shadow: 0 4px 20px rgba(34, 211, 238, 0.4);
+    position: relative;
+  }
+  .mic-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .mic-btn.listening {
+    animation: pulse 1.5s infinite;
+    background: linear-gradient(135deg, #ef4444, #f97316);
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    50% { box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); }
+  }
+  .status {
+    flex: 1;
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 20px;
+  }
+  .status.active { color: var(--accent); }
+
+  /* Modal */
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h2 { font-size: 18px; margin-bottom: 16px; }
+  .modal label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 12px 0 6px;
+  }
+  .modal input, .modal select {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .modal input:focus, .modal select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .modal-actions {
+    display: flex; gap: 10px;
+    margin-top: 20px;
+  }
+  .btn {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .hint a { color: var(--accent); }
+
+  .welcome {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+  }
+  .welcome .big {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+  .welcome h3 {
+    color: var(--text);
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .welcome p { font-size: 14px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-wrap">
+    <div class="avatar">🎓</div>
+    <div class="title">
+      <h1>Guru Bahasa</h1>
+      <p id="subtitle">Ngobrol santai, belajar asyik</p>
+    </div>
+  </div>
+  <button class="icon-btn" id="settingsBtn" title="Pengaturan">⚙️</button>
+</header>
+
+<main id="chat">
+  <div class="welcome" id="welcome">
+    <div class="big">👋</div>
+    <h3>Halo! Aku guru bahasamu</h3>
+    <p>Tekan tombol mic buat ngobrol santai. Kita bisa latihan bahasa Inggris atau Indonesia — santai aja kayak ngopi bareng teman.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="status" id="status">Siap ngobrol. Tekan mic untuk mulai.</div>
+  <button class="mic-btn" id="micBtn" title="Tekan untuk bicara">🎤</button>
+</footer>
+
+<!-- Settings Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h2>⚙️ Pengaturan</h2>
+
+    <label>Bahasa Target</label>
+    <select id="targetLang">
+      <option value="English">🇬🇧 English (Inggris)</option>
+      <option value="Indonesian">🇮🇩 Indonesian (Indonesia)</option>
+      <option value="Japanese">🇯🇵 Japanese (Jepang)</option>
+      <option value="Korean">🇰🇷 Korean (Korea)</option>
+      <option value="Spanish">🇪🇸 Spanish (Spanyol)</option>
+    </select>
+
+    <label>OpenAI API Key</label>
+    <input type="password" id="apiKey" placeholder="sk-..." />
+    <div class="hint">
+      Dapatkan di <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>. Key disimpan lokal di browser kamu aja, gak dikirim ke mana-mana.
+    </div>
+
+    <label>Model</label>
+    <select id="model">
+      <option value="gpt-4o-mini">gpt-4o-mini (cepat & hemat)</option>
+      <option value="gpt-4o">gpt-4o (lebih pinter)</option>
+      <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+    </select>
+
+    <label>Suara AI (TTS)</label>
+    <select id="voiceSelect"></select>
+    <div class="hint">Suara tergantung browser & OS kamu.</div>
+
+    <label>Kecepatan Bicara</label>
+    <input type="range" id="rate" min="0.5" max="1.5" step="0.1" value="1" />
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="cancelBtn">Batal</button>
+      <button class="btn btn-primary" id="saveBtn">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ STATE ============
+const state = {
+  targetLang: localStorage.getItem('gb_targetLang') || 'English',
+  apiKey: localStorage.getItem('gb_apiKey') || '',
+  model: localStorage.getItem('gb_model') || 'gpt-4o-mini',
+  rate: parseFloat(localStorage.getItem('gb_rate') || '1'),
+  voiceURI: localStorage.getItem('gb_voiceURI') || '',
+  history: [],
+  isListening: false,
+  isSpeaking: false,
+};
+
+// ============ ELEMENTS ============
+const chatEl = document.getElementById('chat');
+const welcomeEl = document.getElementById('welcome');
+const micBtn = document.getElementById('micBtn');
+const statusEl = document.getElementById('status');
+const subtitleEl = document.getElementById('subtitle');
+const modal = document.getElementById('modal');
+const settingsBtn = document.getElementById('settingsBtn');
+const saveBtn = document.getElementById('saveBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+const apiKeyInput = document.getElementById('apiKey');
+const targetLangSelect = document.getElementById('targetLang');
+const modelSelect = document.getElementById('model');
+const voiceSelect = document.getElementById('voiceSelect');
+const rateInput = document.getElementById('rate');
+
+// ============ INIT ============
+function init() {
+  updateSubtitle();
+  loadVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = loadVoices;
+  }
+  if (!state.apiKey) {
+    setTimeout(() => {
+      addSystemMessage("Hei! Sebelum mulai, atur dulu API key OpenAI kamu ya. Tekan ⚙️ di pojok kanan atas. Tenang, gratis kok buat nyoba-nyoba.");
+    }, 500);
+  }
+}
+
+function updateSubtitle() {
+  const map = {
+    'English': 'Ngobrol santai in English',
+    'Indonesian': 'Ngobrol santai in Indonesian',
+    'Japanese': '日本語でリラックス',
+    'Korean': '한국어로 수다',
+    'Spanish': 'Charla relajada en español',
+  };
+  subtitleEl.textContent = map[state.targetLang] || 'Ngobrol santai';
+}
+
+// ============ VOICES ============
+function loadVoices() {
+  const voices = speechSynthesis.getVoices();
+  voiceSelect.innerHTML = '';
+  // Prioritize voices matching target language
+  const langMap = {
+    'English': 'en',
+    'Indonesian': 'id',
+    'Japanese': 'ja',
+    'Korean': 'ko',
+    'Spanish': 'es',
+  };
+  const targetCode = langMap[state.targetLang] || 'en';
+
+  // Sort: matching lang first
+  const sorted = [...voices].sort((a, b) => {
+    const aMatch = a.lang.toLowerCase().startsWith(targetCode) ? 0 : 1;
+    const bMatch = b.lang.toLowerCase().startsWith(targetCode) ? 0 : 1;
+    return aMatch - bMatch;
+  });
+
+  sorted.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = v.voiceURI;
+    opt.textContent = `${v.name} (${v.lang})`;
+    voiceSelect.appendChild(opt);
+  });
+
+  if (state.voiceURI) voiceSelect.value = state.voiceURI;
+}
+
+function getSelectedVoice() {
+  const voices = speechSynthesis.getVoices();
+  return voices.find(v => v.voiceURI === voiceSelect.value) || voices[0];
+}
+
+// ============ MODAL ============
+settingsBtn.addEventListener('click', () => {
+  apiKeyInput.value = state.apiKey;
+  targetLangSelect.value = state.targetLang;
+  modelSelect.value = state.model;
+  rateInput.value = state.rate;
+  modal.classList.add('show');
+});
+cancelBtn.addEventListener('click', () => modal.classList.remove('show'));
+saveBtn.addEventListener('click', () => {
+  state.apiKey = apiKeyInput.value.trim();
+  state.targetLang = targetLangSelect.value;
+  state.model = modelSelect.value;
+  state.rate = parseFloat(rateInput.value);
+  state.voiceURI = voiceSelect.value;
+
+  localStorage.setItem('gb_apiKey', state.apiKey);
+  localStorage.setItem('gb_targetLang', state.targetLang);
+  localStorage.setItem('gb_model', state.model);
+  localStorage.setItem('gb_rate', state.rate);
+  localStorage.setItem('gb_voiceURI', state.voiceURI);
+
+  updateSubtitle();
+  modal.classList.remove('show');
+  setStatus('Pengaturan disimpan ✅');
+});
+
+// ============ CHAT UI ============
+function hideWelcome() {
+  if (welcomeEl) welcomeEl.style.display = 'none';
+}
+
+function addMessage(role, text, translation = null) {
+  hideWelcome();
+  const msg = document.createElement('div');
+  msg.className = `msg ${role}`;
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+
+  if (role === 'ai' && translation) {
+    const tag = document.createElement('span');
+    tag.className = 'lang-tag';
+    tag.textContent = state.targetLang;
+    bubble.appendChild(tag);
+    const main = document.createElement('span');
+    main.textContent = text;
+    bubble.appendChild(main);
+    const tr = document.createElement('span');
+    tr.className = 'translation';
+    tr.textContent = '🇮🇩 ' + translation;
+    bubble.appendChild(tr);
+  } else {
+    bubble.textContent = text;
+  }
+
+  msg.appendChild(bubble);
+  chatEl.appendChild(msg);
+  chatEl.scrollTop = chatEl.scrollHeight;
+  return bubble;
+}
+
+function addSystemMessage(text) {
+  hideWelcome();
+  const msg = document.createElement('div');
+  msg.className = 'msg ai';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  msg.appendChild(bubble);
+  chatEl.appendChild(msg);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function addTyping() {
+  hideWelcome();
+  const msg = document.createElement('div');
+  msg.className = 'msg ai';
+  msg.id = 'typing-msg';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  msg.appendChild(bubble);
+  chatEl.appendChild(msg);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+function removeTyping() {
+  const t = document.getElementById('typing-msg');
+  if (t) t.remove();
+}
+
+function setStatus(text, active = false) {
+  statusEl.textContent = text;
+  statusEl.classList.toggle('active', active);
+}
+
+// ============ SPEECH RECOGNITION ============
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    stopListening();
+    handleUserInput(transcript);
+  };
+  recognition.onerror = (e) => {
+    console.error('Speech error:', e);
+    stopListening();
+    if (e.error === 'not-allowed') {
+      setStatus('Izin mic ditolak. Cek pengaturan browser.');
+    } else if (e.error === 'no-speech') {
+      setStatus('Gak kedengeran. Coba lagi ya.');
+    } else {
+      setStatus('Error: ' + e.error);
+    }
+  };
+  recognition.onend = () => {
+    if (state.isListening) stopListening();
+  };
+}
+
+function startListening() {
+  if (!recognition) {
+    setStatus('Browser gak support speech recognition. Coba Chrome ya.');
+    return;
+  }
+  const langMap = {
+    'English': 'en-US',
+    'Indonesian': 'id-ID',
+    'Japanese': 'ja-JP',
+    'Korean': 'ko-KR',
+    'Spanish': 'es-ES',
+  };
+  recognition.lang = langMap[state.targetLang] || 'en-US';
+
+  try {
+    recognition.start();
+    state.isListening = true;
+    micBtn.classList.add('listening');
+    micBtn.innerHTML = '⏹️';
+    setStatus('Lagi dengerin... ngomong dong 🎧', true);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function stopListening() {
+  state.isListening = false;
+  micBtn.classList.remove('listening');
+  micBtn.innerHTML = '🎤';
+  try { recognition.stop(); } catch(e) {}
+}
+
+micBtn.addEventListener('click', () => {
+  if (state.isListening) {
+    stopListening();
+    setStatus('Diberhentikan.');
+  } else {
+    if (state.isSpeaking) {
+      speechSynthesis.cancel();
+      state.isSpeaking = false;
+    }
+    startListening();
+  }
+});
+
+// ============ MAIN FLOW ============
+async function handleUserInput(text) {
+  if (!text.trim()) return;
+  addMessage('user', text);
+
+  if (!state.apiKey) {
+    setStatus('API key belum diisi. Tekan ⚙️ buat atur.');
+    return;
+  }
+
+  addTyping();
+  setStatus('Guru lagi mikir... 🤔', true);
+
+  try {
+    const reply = await callGPT(text);
+    removeTyping();
+    addMessage('ai', reply.text, reply.translation);
+    speak(reply.text);
+  } catch (err) {
+    removeTyping();
+    console.error(err);
+    addSystemMessage('Ups, ada error: ' + err.message);
+    setStatus('Error. Coba lagi ya.');
+  }
+}
+
+async function callGPT(userText) {
+  const systemPrompt = `Kamu adalah "Guru Bahasa", teman ngobrol yang santai, asyik, dan lucu. Gaya bicaramu kayak teman nongkrong di coffee shop — pakai bahasa gaul tapi tetap sopan, sesekali pakai emoji, dan suka ngeledek tipis-tipis.
+
+Bahasa target yang sedang dipelajari user: ${state.targetLang}.
+
+ATURAN PENTING:
+1. Selalu balas menggunakan ${state.targetLang} (bahasa target), karena tujuannya biar user terbiasa.
+2. Jawaban singkat aja, maksimal 2-3 kalimat. Jangan panjang lebar kayak dosen.
+3. Kalau user bicara dalam bahasa Indonesia, tetap balas pakai ${state.targetLang}, tapi selipkan koreksi kecil kalau ada yang salah.
+4. Sesekali ajak user ngobrol balik dengan pertanyaan ringan.
+5. Topik bebas: hobi, makanan, film, cuaca, kehidupan sehari-hari.
+6. Jangan pakai bahasa Indonesia sama sekali di jawaban utama.
+
+User bilang: "${userText}"
+
+Balas dalam format JSON persis seperti ini (JANGAN pakai markdown, JANGAN pakai code block):
+{"text": "jawaban kamu dalam ${state.targetLang}", "translation": "terjemahan bahasa Indonesia dari jawaban kamu"}`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...state.history.slice(-10), // keep last 10 for context
+    { role: 'user', content: userText }
+  ];
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${state.apiKey}`
+    },
+    body: JSON.stringify({
+      model: state.model,
+      messages: messages,
+      temperature: 0.8,
+      response_format: { type: 'json_object' }
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`API error ${res.status}: ${err.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const content = data.choices[0].message.content;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch (e) {
+    // Fallback: try to extract JSON
+    const match = content.match(/\{[\s\S]*\}/);
+    if (match) parsed = JSON.parse(match[0]);
+    else throw new Error('Response bukan JSON valid');
+  }
+
+  // Save to history
+  state.history.push({ role: 'user', content: userText });
+  state.history.push({ role: 'assistant', content: parsed.text || content });
+  if (state.history.length > 20) state.history = state.history.slice(-20);
+
+  return {
+    text: parsed.text || 'Hmm, coba ulang ya?',
+    translation: parsed.translation || ''
+  };
+}
+
+// ============ TTS ============
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    setStatus('Browser gak support TTS.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const voice = getSelectedVoice();
+  if (voice) utter.voice = voice;
+
+  const langMap = {
+    'English': 'en-US',
+    'Indonesian': 'id-ID',
+    'Japanese': 'ja-JP',
+    'Korean': 'ko-KR',
+    'Spanish': 'es-ES',
+  };
+  utter.lang = langMap[state.targetLang] || 'en-US';
+  utter.rate = state.rate;
+  utter.pitch = 1;
+
+  utter.onstart = () => {
+    state.isSpeaking = true;
+    setStatus('Guru lagi ngomong... 🔊', true);
+  };
+  utter.onend = () => {
+    state.isSpeaking = false;
+    setStatus('Siap ngobrol lagi. Tekan mic 🎤');
+  };
+  utter.onerror = () => {
+    state.isSpeaking = false;
+    setStatus('TTS error.');
+  };
+
+  speechSynthesis.speak(utter);
+}
+
+// ============ START ============
+init();
+</script>
+</body>
+</html>
