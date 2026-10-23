@@ -102,8 +102,8 @@
 
   .speech-bubble {
     position: absolute;
-    top: 80px;
-    right: 20px;
+    top: 60px;
+    right: 10px;
     background: white;
     color: #1f2937;
     padding: 14px 18px;
@@ -111,7 +111,7 @@
     border-bottom-right-radius: 4px;
     font-size: 14px;
     font-weight: 500;
-    max-width: 240px;
+    max-width: 260px;
     min-width: 120px;
     opacity: 0;
     transform: scale(0.5);
@@ -300,7 +300,22 @@
     border-radius: 50%;
     box-shadow: inset -4px -6px 12px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.2);
     z-index: 2;
+    transition: background .5s;
   }
+
+  /* Eyebrows for expressions */
+  .eyebrow {
+    position: absolute;
+    top: 48px;
+    width: 26px;
+    height: 5px;
+    background: #1f2937;
+    border-radius: 3px;
+    z-index: 6;
+    transition: all .3s;
+  }
+  .eyebrow.left { left: 38px; }
+  .eyebrow.right { right: 38px; }
 
   .glasses {
     position: absolute;
@@ -390,6 +405,7 @@
     opacity: 0.6;
     z-index: 3;
     filter: blur(1px);
+    transition: all .3s;
   }
   .cheek.left { left: 28px; }
   .cheek.right { right: 28px; }
@@ -404,7 +420,7 @@
     background: #7c2d12;
     border-radius: 0 0 20px 20px;
     z-index: 4;
-    transition: all .2s;
+    transition: all .3s;
   }
 
   .bowtie {
@@ -439,32 +455,24 @@
     z-index: 1;
   }
 
+  /* ============ EXPRESSIONS ============ */
+  
+  /* Listening */
   .character.listening { animation: shake 0.4s ease-in-out infinite !important; }
-  @keyframes shake {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    25% { transform: translateY(-4px) rotate(-3deg); }
-    75% { transform: translateY(-4px) rotate(3deg); }
-  }
   .character.listening .eye { width: 32px; height: 32px; animation: none; }
   .character.listening .pupil { width: 10px; height: 10px; }
-  .character.listening .mouth {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: #7c2d12;
-  }
+  .character.listening .mouth { width: 22px; height: 22px; border-radius: 50%; }
 
+  /* Thinking */
   .character.thinking .head-wrap { animation: tilt 2s ease-in-out infinite; }
   @keyframes tilt {
     0%, 100% { transform: translateX(-50%) rotate(-5deg); }
     50% { transform: translateX(-50%) rotate(5deg); }
   }
   .character.thinking .pupil { top: 20%; transform: translateX(-50%); }
-  .character.thinking .mouth {
-    width: 28px; height: 10px;
-    border-radius: 0 0 10px 10px;
-    transform: translateX(-50%) rotate(-10deg);
-  }
+  .character.thinking .mouth { width: 28px; height: 10px; border-radius: 0 0 10px 10px; transform: translateX(-50%) rotate(-10deg); }
 
+  /* Speaking */
   .character.speaking .head-wrap { animation: bounce 0.5s ease-in-out infinite; }
   @keyframes bounce {
     0%, 100% { transform: translateX(-50%) translateY(0); }
@@ -476,19 +484,82 @@
     50% { height: 26px; width: 24px; border-radius: 50%; }
   }
 
-  .character.happy .eye {
-    height: 10px;
-    border-radius: 10px 10px 0 0;
-    background: #1f2937;
-    animation: none;
-  }
+  /* Happy / Normal Smile */
+  .character.happy .mouth { width: 48px; height: 22px; border-radius: 0 0 30px 30px; }
+  .character.happy .eye { animation: none; height: 10px; border-radius: 10px 10px 0 0; background: #1f2937; }
   .character.happy .pupil { display: none; }
-  .character.happy .mouth {
-    width: 48px;
-    height: 22px;
-    border-radius: 0 0 30px 30px;
+
+  /* Joking / Nge-banyol (Wink + Smirk) */
+  .character.joking .eye.left { height: 6px; border-radius: 10px 10px 0 0; background: #1f2937; }
+  .character.joking .eye.left .pupil { display: none; }
+  .character.joking .mouth { width: 36px; height: 16px; border-radius: 0 20px 20px 20px; transform: translateX(-40%); }
+  .character.joking .cheek { opacity: 0.8; }
+
+  /* Angry / Marah (Frown + Red Face + Shake) */
+  .character.angry { animation: shake 0.3s infinite !important; }
+  .character.angry .face { background: radial-gradient(circle at 35% 35%, #fde4c7, #fca5a5 60%, #f87171); }
+  .character.angry .eyebrow.left { transform: rotate(25deg); top: 44px; left: 36px; }
+  .character.angry .eyebrow.right { transform: rotate(-25deg); top: 44px; right: 36px; }
+  .character.angry .mouth { width: 24px; height: 8px; border-radius: 20px 20px 0 0; top: 155px; }
+  .character.angry .cheek { background: #ef4444; opacity: 0.7; }
+
+  /* Sad / Sedih (Droopy mouth + tears + looking down) */
+  .character.sad .eyebrow.left { transform: rotate(-20deg); top: 40px; left: 32px; }
+  .character.sad .eyebrow.right { transform: rotate(20deg); top: 40px; right: 32px; }
+  .character.sad .mouth { width: 24px; height: 10px; border-radius: 20px 20px 0 0; top: 158px; }
+  .character.sad .pupil { top: 65%; }
+  .character.sad .eye::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: 6px;
+    width: 6px;
+    height: 9px;
+    background: #38bdf8;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: tearDrop 2s infinite;
+    opacity: 0;
+  }
+  @keyframes tearDrop {
+    0% { opacity: 0; transform: translateY(0); }
+    30% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(18px); }
   }
 
+  /* Shout / Teriak (Wide open mouth + intense shake) */
+  .character.shout { animation: shake 0.15s infinite !important; }
+  .character.shout .mouth {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    top: 145px;
+    animation: shoutPulse 0.3s infinite;
+    background: #450a0a;
+  }
+  .character.shout .mouth::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 10px;
+    background: #f87171;
+    border-radius: 10px 10px 0 0;
+  }
+  .character.shout .eye { width: 32px; height: 32px; }
+  @keyframes shoutPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.15); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-3px) rotate(-2deg); }
+    75% { transform: translateY(-3px) rotate(2deg); }
+  }
+
+  /* ============ MODALS ============ */
   .modal-bg {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.7);
@@ -538,7 +609,6 @@
   .btn-secondary { background: rgba(255,255,255,0.08); color: var(--text); }
   .btn:hover { transform: translateY(-1px); }
   .hint { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
-  .hint a { color: var(--accent); }
   .free-info {
     background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.3);
@@ -638,7 +708,7 @@
     transition: all .2s;
   }
   .clear-history:hover { background: rgba(239, 68, 68, 0.25); }
-</style>
+</style.
 </head>
 <body>
 
@@ -646,7 +716,7 @@
   <div class="title-wrap">
     <div class="title">
       <h1>🎓 Guru Bahasa <span class="free-badge">100% GRATIS</span></h1>
-      <p id="subtitle">Klik guru buat ngobrol!</p>
+      <p id="subtitle">Bisa marah, sedih, banyol, teriak!</p>
     </div>
   </div>
   <button class="icon-btn" id="settingsBtn" title="Pengaturan">⚙️</button>
@@ -669,6 +739,8 @@
     <div class="head-wrap">
       <div class="hat"><div class="tassel"></div></div>
       <div class="face">
+        <div class="eyebrow left"></div>
+        <div class="eyebrow right"></div>
         <div class="glasses">
           <div class="lens left"></div>
           <div class="lens right"></div>
@@ -690,7 +762,6 @@
 <div class="modal-bg" id="modal">
   <div class="modal">
     <h2>⚙️ Pengaturan</h2>
-
     <label>Bahasa Target</label>
     <select id="targetLang">
       <option value="English">🇬🇧 English (Inggris)</option>
@@ -721,16 +792,14 @@
       <option value="sage">🎙️ Sage — tenang, bijak</option>
       <option value="shimmer">🎙️ Shimmer — manis, lembut</option>
     </select>
-    <div class="hint">
-      💚 Suara dari OpenAI TTS — natural banget!
-    </div>
+    <div class="hint">💚 Suara dari OpenAI TTS — natural banget!</div>
     <div class="voice-card">
       <span>🔊 Coba dengerin suaranya:</span>
       <button class="preview-btn" id="previewVoice">▶️ Preview</button>
     </div>
 
     <div class="free-info">
-      💚 <strong>Gratis total!</strong>.
+      💚 <strong>Gratis total!</strong>Guru ini punya mood: bisa banyol, marah, sedih, atau teriak!
     </div>
 
     <div class="modal-actions">
@@ -789,6 +858,7 @@ const speechBubble = document.getElementById('speechBubble');
 // ============ CHARACTER EXPRESSIONS ============
 let bubbleTimeout = null;
 function setExpression(expr, bubbleText = null, translation = null) {
+  // Reset all expression classes first, keep base 'character'
   character.className = 'character ' + expr;
   clearTimeout(bubbleTimeout);
   
@@ -807,7 +877,7 @@ function setExpression(expr, bubbleText = null, translation = null) {
     
     speechBubble.classList.add('show');
     
-    if (expr === 'idle' || expr === 'happy') {
+    if (expr === 'idle' || expr === 'happy' || expr === 'joking') {
       bubbleTimeout = setTimeout(() => {
         speechBubble.classList.remove('show');
       }, 4000);
@@ -964,7 +1034,7 @@ function startListening() {
   if (!recognition) {
     setStatus('Browser gak support speech recognition. Coba Chrome ya.');
     return;
-  }
+ }
   const langMap = { 'English': 'en-US', 'Indonesian': 'id-ID', 'Japanese': 'ja-JP', 'Korean': 'ko-KR', 'Spanish': 'es-ES' };
   recognition.lang = langMap[state.targetLang] || 'en-US';
   try {
@@ -1009,34 +1079,49 @@ async function handleUserInput(text) {
     state.history.push({ role: 'ai', text: reply.text, translation: reply.translation });
     updateHistoryBadge();
     
-    setExpression('speaking', reply.text, reply.translation);
+    // Apply emotion from AI response
+    const emotion = reply.emotion || 'normal';
+    setExpression(emotion, reply.text, reply.translation);
+    
     await speak(reply.text);
+    
+    // Return to happy/idle after speaking
+    setTimeout(() => {
+      if (!state.isSpeaking) {
+        setExpression('happy', 'Giliranmu! 👆');
+        setStatus('Klik guru buat ngobrol lagi');
+      }
+    }, 1000);
+    
   } catch (err) {
     console.error(err);
-    setExpression('idle', 'Yah error 😵');
+    setExpression('sad', 'Yah error 😵');
     setStatus('Error: ' + err.message);
   }
 }
 
 // ============ AI CALL VIA PUTER.JS ============
 async function callAI(userText) {
-  const systemPrompt = `Kamu adalah "Guru Bahasa", teman ngobrol yang santai, asyik, dan lucu. Gaya bicaramu kayak teman nongkrong di coffee shop — pakai bahasa gaul tapi tetap sopan, sesekali pakai emoji, dan suka ngeledek tipis-tipis.
+  const systemPrompt = `Kamu adalah "Guru Bahasa", teman ngobrol yang santai, asyik, dan lucu. Gaya bicaramu kayak teman nongkrong di coffee shop — pakai bahasa gaul tapi tetap sopan, dan ekspresif.
 
 Bahasa target yang sedang dipelajari user: ${state.targetLang}.
 
 ATURAN PENTING:
 1. Selalu balas menggunakan ${state.targetLang} (bahasa target).
 2. Jawaban singkat aja, maksimal 2-3 kalimat.
-3. Kalau user bicara dalam bahasa Indonesia, tetap balas pakai ${state.targetLang}, tapi selipkan koreksi kecil kalau ada yang salah.
-4. Sesekali ajak user ngobrol balik dengan pertanyaan ringan.
-5. Topik bebas: hobi, makanan, film, cuaca, kehidupan sehari-hari.
-6. Jangan pakai bahasa Indonesia sama sekali di jawaban utama.
-7. PENTING untuk TTS: Jangan pakai simbol seperti *, _, -, # di jawaban. Tulis natural seperti orang ngomong.
+3. Kamu PUNYA MOOD/EMOSI! Gunakan field "emotion" di JSON sesuai konteks:
+   - "joking": kalau lagi nge-banyol, bercanda, atau ngeledek tipis.
+   - "angry": kalau user malas, salah terus, atau bikin kesal (marah dikit tapi tetap lucu/tsundere).
+   - "sad": kalau user bilang sesuatu yang sedih, gagal, atau kamu ikut sedih.
+   - "shout": kalau lagi semangat banget, kaget, atau mau menekankan sesuatu dengan teriak.
+   - "happy": kalau user benar atau bilang sesuatu yang bagus.
+   - "normal": kalau biasa aja.
+4. Jangan pakai simbol seperti *, _, -, # di jawaban "text" karena akan diucapkan TTS.
 
 User bilang: "${userText}"
 
 Balas dalam format JSON persis seperti ini:
-{"text": "jawaban kamu dalam ${state.targetLang}", "translation": "terjemahan bahasa Indonesia dari jawaban kamu"}
+{"text": "jawaban kamu dalam ${state.targetLang}", "translation": "terjemahan bahasa Indonesia", "emotion": "joking|angry|sad|shout|happy|normal"}
 
 PENTING: Output HANYA JSON, jangan ada teks lain.`;
 
@@ -1049,7 +1134,7 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
   try {
     const response = await puter.ai.chat(messages, {
       model: state.model,
-      temperature: 0.8
+      temperature: 0.9 // Slightly higher for more emotional variety
     });
 
     const content = typeof response === 'string' ? response : response.message?.content || response.text || '';
@@ -1063,7 +1148,7 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
         try { parsed = JSON.parse(match[0]); }
         catch (e2) { throw new Error('Response bukan JSON valid'); }
       } else {
-        parsed = { text: content.trim(), translation: '' };
+        parsed = { text: content.trim(), translation: '', emotion: 'normal' };
       }
     }
 
@@ -1073,7 +1158,8 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
 
     return {
       text: parsed.text || 'Hmm, coba ulang ya?',
-      translation: parsed.translation || ''
+      translation: parsed.translation || '',
+      emotion: parsed.emotion || 'normal'
     };
   } catch (err) {
     throw new Error(err.message || 'Gagal connect ke AI');
@@ -1085,31 +1171,24 @@ async function playTTS(text, voice) {
   console.log('🔊 TTS called with:', { text: text.substring(0, 50), voice });
   
   try {
-    // Call Puter TTS
     const audioResult = await puter.ai.txt2speech(text, voice);
     console.log('🔊 Puter TTS result type:', typeof audioResult, audioResult);
     
     let audioElement;
     
-    // Handle different return types
     if (audioResult instanceof HTMLAudioElement) {
-      // Already an audio element
       audioElement = audioResult;
     } else if (audioResult && typeof audioResult === 'object' && audioResult.play) {
-      // Object with play method
       audioElement = audioResult;
     } else if (audioResult instanceof Blob) {
-      // Blob - create object URL
       const url = URL.createObjectURL(audioResult);
       audioElement = new Audio(url);
     } else if (typeof audioResult === 'string') {
-      // String URL
       audioElement = new Audio(audioResult);
     } else {
       throw new Error('Unknown TTS return type: ' + typeof audioResult);
     }
     
-    // Wait for audio to be ready
     return new Promise((resolve, reject) => {
       audioElement.onended = () => {
         console.log('🔊 Audio ended');
@@ -1121,7 +1200,6 @@ async function playTTS(text, voice) {
         reject(new Error('Audio playback failed'));
       };
       
-      // Try to play
       audioElement.play().then(() => {
         console.log('🔊 Audio playing');
       }).catch(err => {
@@ -1129,7 +1207,6 @@ async function playTTS(text, voice) {
         reject(err);
       });
       
-      // Store reference
       state.currentAudio = audioElement;
     });
     
@@ -1163,8 +1240,6 @@ async function speak(text) {
     
     state.isSpeaking = false;
     state.currentAudio = null;
-    setExpression('happy', 'Giliranmu! 👆');
-    setStatus('Klik guru buat ngobrol lagi');
   } catch (err) {
     console.error('Speak error:', err);
     state.isSpeaking = false;
@@ -1176,13 +1251,12 @@ async function speak(text) {
       speakFallback(cleanText);
     } catch (fallbackErr) {
       console.error('Fallback also failed:', fallbackErr);
-      setExpression('idle', 'Suara error 😵');
+      setExpression('sad', 'Suara error 😵');
       setStatus('TTS error. Coba lagi.');
     }
   }
 }
 
-// Fallback TTS using Web Speech API
 function speakFallback(text) {
   if (!('speechSynthesis' in window)) {
     throw new Error('Web Speech API not supported');
@@ -1196,21 +1270,17 @@ function speakFallback(text) {
   utter.rate = 1;
   utter.pitch = 1;
 
-  utter.onstart = () => {
-    console.log('🔊 Fallback TTS started');
-  };
-
+  utter.onstart = () => console.log('🔊 Fallback TTS started');
   utter.onend = () => {
     console.log('🔊 Fallback TTS ended');
     state.isSpeaking = false;
     setExpression('happy', 'Giliranmu! 👆');
     setStatus('Klik guru buat ngobrol lagi');
   };
-
   utter.onerror = () => {
     console.error('🔊 Fallback TTS error');
     state.isSpeaking = false;
-    setExpression('idle', 'Suara error 😵');
+    setExpression('sad', 'Suara error 😵');
     setStatus('TTS error. Coba lagi.');
   };
 
