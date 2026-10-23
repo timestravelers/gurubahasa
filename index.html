@@ -119,10 +119,7 @@
     pointer-events: none;
     z-index: 20;
   }
-  .speech-bubble.show {
-    opacity: 1;
-    transform: scale(1);
-  }
+  .speech-bubble.show { opacity: 1; transform: scale(1); }
   .speech-bubble::after {
     content: '';
     position: absolute;
@@ -588,6 +585,37 @@
     color: var(--free);
     line-height: 1.5;
   }
+  .voice-preview {
+    display: inline-block;
+    background: rgba(34, 211, 238, 0.15);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    margin-left: 6px;
+    font-weight: 600;
+  }
+  .voice-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 6px;
+    margin-top: 6px;
+    font-size: 12px;
+  }
+  .preview-btn {
+    background: rgba(34, 211, 238, 0.2);
+    color: var(--accent);
+    border: none;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .preview-btn:hover { background: rgba(34, 211, 238, 0.35); }
 </style>
 </head>
 <body>
@@ -636,7 +664,7 @@
 <main id="chat">
   <div class="welcome" id="welcome">
     <h3>Halo! Aku guru bahasamu 👋</h3>
-    <p>Klik guru di atas buat mulai ngobrol. 100% gratis, no API key, no credit card!</p>
+    <p>Klik guru di atas buat mulai ngobrol. Suara natural, 100% gratis!</p>
   </div>
 </main>
 
@@ -657,19 +685,33 @@
     <select id="model">
       <option value="gpt-4o-mini">🚀 GPT-4o Mini (cepat, rekomendasi)</option>
       <option value="gpt-4o">💎 GPT-4o (lebih pinter)</option>
-      <option value="claude-sonnet">🤖 Claude Sonnet</option>
+      <option value="claude-sonnet-4">🤖 Claude Sonnet 4</option>
       <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash</option>
     </select>
 
-    <label>Suara AI (TTS)</label>
-    <select id="voiceSelect"></select>
-    <div class="hint">Suara tergantung browser & OS kamu.</div>
-
-    <label>Kecepatan Bicara</label>
-    <input type="range" id="rate" min="0.5" max="1.5" step="0.1" value="1" />
+    <label>Suara AI <span class="voice-preview">🎙️ NATURAL</span></label>
+    <select id="voiceSelect">
+      <option value="alloy">🎙️ Alloy — netral, seimbang</option>
+      <option value="ash">🎙️ Ash — berat, maskulin</option>
+      <option value="ballad">🎙️ Ballad — lembut, bercerita</option>
+      <option value="coral">🎙️ Coral — hangat, ramah</option>
+      <option value="echo">🎙️ Echo — energik, jelas</option>
+      <option value="fable">🎙️ Fable — british, sopan</option>
+      <option value="nova">🎙️ Nova — ceria, feminin</option>
+      <option value="onyx">🎙️ Onyx — dalam, berwibawa</option>
+      <option value="sage">🎙️ Sage — tenang, bijak</option>
+      <option value="shimmer">🎙️ Shimmer — manis, lembut</option>
+    </select>
+    <div class="hint">
+      💚 Suara dari OpenAI TTS — natural banget, gak kayak robot! Klik "Simpan" terus coba dengerin.
+    </div>
+    <div class="voice-card">
+      <span>🔊 Coba dengerin suaranya:</span>
+      <button class="preview-btn" id="previewVoice">▶️ Preview</button>
+    </div>
 
     <div class="free-info">
-      💚 <strong>Gratis total!</strong> Pakai Puter.js, jadi gak butuh API key atau credit card sama sekali. Semua model AI di atas bisa dipakai gratis.
+      💚 <strong>Gratis total!</strong> Pakai Puter.js, jadi gak butuh API key atau credit card. Suara natural pakai OpenAI TTS.
     </div>
 
     <div class="modal-actions">
@@ -684,11 +726,11 @@
 const state = {
   targetLang: localStorage.getItem('gb_targetLang') || 'English',
   model: localStorage.getItem('gb_model') || 'gpt-4o-mini',
-  rate: parseFloat(localStorage.getItem('gb_rate') || '1'),
-  voiceURI: localStorage.getItem('gb_voiceURI') || '',
+  voice: localStorage.getItem('gb_voice') || 'nova',
   history: [],
   isListening: false,
   isSpeaking: false,
+  currentAudio: null,
 };
 
 // ============ ELEMENTS ============
@@ -700,10 +742,10 @@ const modal = document.getElementById('modal');
 const settingsBtn = document.getElementById('settingsBtn');
 const saveBtn = document.getElementById('saveBtn');
 const cancelBtn = document.getElementById('cancelBtn');
+const previewVoiceBtn = document.getElementById('previewVoice');
 const targetLangSelect = document.getElementById('targetLang');
 const modelSelect = document.getElementById('model');
 const voiceSelect = document.getElementById('voiceSelect');
-const rateInput = document.getElementById('rate');
 const character = document.getElementById('character');
 const speechBubble = document.getElementById('speechBubble');
 
@@ -727,10 +769,7 @@ function setExpression(expr, bubbleText = null) {
 // ============ INIT ============
 function init() {
   updateSubtitle();
-  loadVoices();
-  if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = loadVoices;
-  }
+  voiceSelect.value = state.voice;
   setExpression('idle', 'Halo! 👋');
 }
 
@@ -745,53 +784,55 @@ function updateSubtitle() {
   subtitleEl.textContent = map[state.targetLang] || 'Klik guru buat ngobrol!';
 }
 
-// ============ VOICES ============
-function loadVoices() {
-  const voices = speechSynthesis.getVoices();
-  voiceSelect.innerHTML = '';
-  const langMap = { 'English': 'en', 'Indonesian': 'id', 'Japanese': 'ja', 'Korean': 'ko', 'Spanish': 'es' };
-  const targetCode = langMap[state.targetLang] || 'en';
-  const sorted = [...voices].sort((a, b) => {
-    const aMatch = a.lang.toLowerCase().startsWith(targetCode) ? 0 : 1;
-    const bMatch = b.lang.toLowerCase().startsWith(targetCode) ? 0 : 1;
-    return aMatch - bMatch;
-  });
-  sorted.forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v.voiceURI;
-    opt.textContent = `${v.name} (${v.lang})`;
-    voiceSelect.appendChild(opt);
-  });
-  if (state.voiceURI) voiceSelect.value = state.voiceURI;
-}
-
-function getSelectedVoice() {
-  const voices = speechSynthesis.getVoices();
-  return voices.find(v => v.voiceURI === voiceSelect.value) || voices[0];
-}
-
 // ============ MODAL ============
 settingsBtn.addEventListener('click', () => {
   targetLangSelect.value = state.targetLang;
   modelSelect.value = state.model;
-  rateInput.value = state.rate;
+  voiceSelect.value = state.voice;
   modal.classList.add('show');
 });
 cancelBtn.addEventListener('click', () => modal.classList.remove('show'));
 saveBtn.addEventListener('click', () => {
   state.targetLang = targetLangSelect.value;
   state.model = modelSelect.value;
-  state.rate = parseFloat(rateInput.value);
-  state.voiceURI = voiceSelect.value;
+  state.voice = voiceSelect.value;
   localStorage.setItem('gb_targetLang', state.targetLang);
   localStorage.setItem('gb_model', state.model);
-  localStorage.setItem('gb_rate', state.rate);
-  localStorage.setItem('gb_voiceURI', state.voiceURI);
+  localStorage.setItem('gb_voice', state.voice);
   updateSubtitle();
-  loadVoices();
   modal.classList.remove('show');
   setExpression('happy', 'Mantap! ✅');
   setStatus('Pengaturan disimpan ✅');
+});
+
+// Preview voice button
+previewVoiceBtn.addEventListener('click', async () => {
+  const voice = voiceSelect.value;
+  previewVoiceBtn.textContent = '⏳ Loading...';
+  previewVoiceBtn.disabled = true;
+  try {
+    const audio = await puter.ai.txt2speech(
+      "Hi! I'm your language teacher. Nice to meet you!",
+      voice
+    );
+    // puter.ai.txt2speech returns an Audio object directly
+    if (audio instanceof HTMLAudioElement || audio.play) {
+      audio.play();
+    } else if (audio instanceof Blob) {
+      const url = URL.createObjectURL(audio);
+      const a = new Audio(url);
+      a.play();
+    }
+    previewVoiceBtn.textContent = '▶️ Preview';
+    previewVoiceBtn.disabled = false;
+  } catch (err) {
+    console.error(err);
+    previewVoiceBtn.textContent = '❌ Error';
+    setTimeout(() => {
+      previewVoiceBtn.textContent = '▶️ Preview';
+      previewVoiceBtn.disabled = false;
+    }, 1500);
+  }
 });
 
 // ============ CHAT UI ============
@@ -913,10 +954,7 @@ character.addEventListener('click', () => {
     setExpression('idle');
     setStatus('Diberhentikan. Klik lagi buat ngobrol.');
   } else if (state.isSpeaking) {
-    speechSynthesis.cancel();
-    state.isSpeaking = false;
-    setExpression('idle');
-    setStatus('Diberhentikan. Klik lagi buat ngobrol.');
+    stopSpeaking();
   } else {
     startListening();
   }
@@ -956,13 +994,14 @@ ATURAN PENTING:
 4. Sesekali ajak user ngobrol balik dengan pertanyaan ringan.
 5. Topik bebas: hobi, makanan, film, cuaca, kehidupan sehari-hari.
 6. Jangan pakai bahasa Indonesia sama sekali di jawaban utama.
+7. PENTING untuk TTS: Jangan pakai simbol seperti *, _, -, #, atau emoji di jawaban, karena akan diucapkan. Tulis natural seperti orang ngomong.
 
 User bilang: "${userText}"
 
 Balas dalam format JSON persis seperti ini:
 {"text": "jawaban kamu dalam ${state.targetLang}", "translation": "terjemahan bahasa Indonesia dari jawaban kamu"}
 
-PENTING: Output HANYA JSON, jangan ada teks lain di luar JSON, jangan pakai markdown, jangan pakai code block.`;
+PENTING: Output HANYA JSON, jangan ada teks lain.`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -971,7 +1010,6 @@ PENTING: Output HANYA JSON, jangan ada teks lain di luar JSON, jangan pakai mark
   ];
 
   try {
-    // Pakai Puter.js AI - GRATIS, tanpa API key!
     const response = await puter.ai.chat(messages, {
       model: state.model,
       temperature: 0.8
@@ -983,13 +1021,11 @@ PENTING: Output HANYA JSON, jangan ada teks lain di luar JSON, jangan pakai mark
     try {
       parsed = JSON.parse(content);
     } catch (e) {
-      // Coba extract JSON dari response
       const match = content.match(/\{[\s\S]*\}/);
       if (match) {
         try { parsed = JSON.parse(match[0]); }
         catch (e2) { throw new Error('Response bukan JSON valid'); }
       } else {
-        // Fallback: anggap seluruh content sebagai text
         parsed = { text: content.trim(), translation: '' };
       }
     }
@@ -1007,38 +1043,69 @@ PENTING: Output HANYA JSON, jangan ada teks lain di luar JSON, jangan pakai mark
   }
 }
 
-// ============ TTS ============
-function speak(text) {
-  if (!('speechSynthesis' in window)) {
-    setStatus('Browser gak support TTS.');
-    return;
-  }
-  speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  const voice = getSelectedVoice();
-  if (voice) utter.voice = voice;
-  const langMap = { 'English': 'en-US', 'Indonesian': 'id-ID', 'Japanese': 'ja-JP', 'Korean': 'ko-KR', 'Spanish': 'es-ES' };
-  utter.lang = langMap[state.targetLang] || 'en-US';
-  utter.rate = state.rate;
-  utter.pitch = 1;
+// ============ TTS NATURAL VIA PUTER.JS ============
+async function speak(text) {
+  // Bersihkan text dari emoji & simbol aneh biar TTS natural
+  const cleanText = text
+    .replace(/[\u{1F600}-\u{1F64F}]/gu, '')
+    .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
+    .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')
+    .replace(/[\u{2600}-\u{26FF}]/gu, '')
+    .replace(/[\u{2700}-\u{27BF}]/gu, '')
+    .replace(/[*_~`#]/g, '')
+    .trim();
 
-  utter.onstart = () => {
-    state.isSpeaking = true;
-    setExpression('speaking', 'Dengerin ya! 🗣️');
-    setStatus('🔊 Guru lagi ngomong...', true);
-  };
-  utter.onend = () => {
-    state.isSpeaking = false;
+  if (!cleanText) {
     setExpression('happy', 'Giliranmu! 👆');
     setStatus('Klik guru buat ngobrol lagi');
-  };
-  utter.onerror = () => {
-    state.isSpeaking = false;
-    setExpression('idle');
-    setStatus('TTS error.');
-  };
+    return;
+  }
 
-  speechSynthesis.speak(utter);
+  state.isSpeaking = true;
+  setExpression('speaking', 'Dengerin ya! 🗣️');
+  setStatus('🔊 Guru lagi ngomong...', true);
+
+  try {
+    // Puter.js TTS - natural, bukan robot!
+    const audio = await puter.ai.txt2speech(cleanText, state.voice);
+
+    state.currentAudio = audio;
+
+    audio.onended = () => {
+      state.isSpeaking = false;
+      state.currentAudio = null;
+      setExpression('happy', 'Giliranmu! 👆');
+      setStatus('Klik guru buat ngobrol lagi');
+    };
+
+    audio.onerror = () => {
+      state.isSpeaking = false;
+      state.currentAudio = null;
+      setExpression('idle', 'Suara error 😵');
+      setStatus('TTS error. Coba lagi.');
+    };
+
+    await audio.play();
+  } catch (err) {
+    console.error('TTS error:', err);
+    state.isSpeaking = false;
+    state.currentAudio = null;
+    setExpression('idle', 'Yah 😵');
+    setStatus('TTS error: ' + (err.message || 'gagal'));
+  }
+}
+
+function stopSpeaking() {
+  if (state.currentAudio) {
+    try {
+      state.currentAudio.pause();
+      state.currentAudio.currentTime = 0;
+    } catch(e) {}
+    state.currentAudio = null;
+  }
+  state.isSpeaking = false;
+  setExpression('idle');
+  setStatus('Diberhentikan. Klik lagi buat ngobrol.');
 }
 
 // ============ START ============
