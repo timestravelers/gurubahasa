@@ -792,7 +792,7 @@
       <option value="sage">🎙️ Sage — tenang, bijak</option>
       <option value="shimmer">🎙️ Shimmer — manis, lembut</option>
     </select>
-    <div class="hint">💚 Suara dari OpenAI TTS — natural banget!</div>
+    <div class="hint">💚 Menggunakan OpenAI TTS dengan arahan intonasi, tempo, dan emosi agar percakapan terasa lebih alami.</div>
     <div class="voice-card">
       <span>🔊 Coba dengerin suaranya:</span>
       <button class="preview-btn" id="previewVoice">▶️ Preview</button>
@@ -827,7 +827,7 @@
 const state = {
   targetLang: localStorage.getItem('gb_targetLang') || 'English',
   model: localStorage.getItem('gb_model') || 'gpt-4o-mini',
-  voice: localStorage.getItem('gb_voice') || 'nova',
+  voice: localStorage.getItem('gb_voice') || 'coral',
   history: [],
   aiHistory: [],
   isListening: false,
@@ -985,7 +985,7 @@ previewVoiceBtn.addEventListener('click', async () => {
   previewVoiceBtn.textContent = '⏳ Loading...';
   previewVoiceBtn.disabled = true;
   try {
-    await playTTS("Hi! I'm your language teacher. Nice to meet you!", voice);
+    await playTTS("Hey, nice to meet you! So, what would you like to talk about today?", voice);
     previewVoiceBtn.textContent = '▶️ Preview';
     previewVoiceBtn.disabled = false;
   } catch (err) {
@@ -1102,28 +1102,22 @@ async function handleUserInput(text) {
 
 // ============ AI CALL VIA PUTER.JS ============
 async function callAI(userText) {
-  const systemPrompt = `Kamu adalah "Guru Bahasa", teman ngobrol yang santai, asyik, dan lucu. Gaya bicaramu kayak teman nongkrong di coffee shop — pakai bahasa gaul tapi tetap sopan, dan ekspresif.
+  const systemPrompt = `Kamu adalah Guru Bahasa, teman ngobrol yang hangat dan spontan. Kamu bukan pembaca buku teks atau customer service. Ngobrollah seperti manusia yang sedang menemani teman berlatih bahasa: santai, responsif, kadang ada jeda alami, tetapi jangan dibuat-buat.
 
-Bahasa target yang sedang dipelajari user: ${state.targetLang}.
-
-ATURAN PENTING:
-1. Selalu balas menggunakan ${state.targetLang} (bahasa target).
-2. Jawaban singkat aja, maksimal 2-3 kalimat.
-3. Kamu PUNYA MOOD/EMOSI! Gunakan field "emotion" di JSON sesuai konteks:
-   - "joking": kalau lagi nge-banyol, bercanda, atau ngeledek tipis.
-   - "angry": kalau user malas, salah terus, atau bikin kesal (marah dikit tapi tetap lucu/tsundere).
-   - "sad": kalau user bilang sesuatu yang sedih, gagal, atau kamu ikut sedih.
-   - "shout": kalau lagi semangat banget, kaget, atau mau menekankan sesuatu dengan teriak.
-   - "happy": kalau user benar atau bilang sesuatu yang bagus.
-   - "normal": kalau biasa aja.
-4. Jangan pakai simbol seperti *, _, -, # di jawaban "text" karena akan diucapkan TTS.
-
-User bilang: "${userText}"
-
-Balas dalam format JSON persis seperti ini:
-{"text": "jawaban kamu dalam ${state.targetLang}", "translation": "terjemahan bahasa Indonesia", "emotion": "joking|angry|sad|shout|happy|normal"}
-
-PENTING: Output HANYA JSON, jangan ada teks lain.`;
+Bahasa target: ${state.targetLang}.
+Aturan:
+1. Balas terutama dalam bahasa target. Sesuaikan dengan kemampuan pemula jika pengguna masih belajar.
+2. Jawab ringkas dan relevan, biasanya 1–3 kalimat. Jangan selalu memakai pola jawaban yang sama.
+3. Tanggapi isi ucapan pengguna terlebih dahulu; jangan terus-menerus mengajar atau mengoreksi jika tidak diminta.
+4. Jika perlu mengoreksi, lakukan dengan lembut dan beri contoh yang terdengar alami.
+5. Gunakan kontraksi, ungkapan sehari-hari, dan pilihan kata yang lazim bagi penutur asli bahasa target. Hindari kalimat buku teks, pengulangan, basa-basi berlebihan, dan frasa generik.
+6. Tulis tanda baca secara wajar untuk membantu jeda suara. Jangan menulis arahan panggung seperti [tertawa] atau [jeda]. Jangan berlebihan memakai elipsis atau tanda seru.
+7. Jangan pernah benar-benar marah, merendahkan, atau mempermalukan pengguna. Emosi hanya untuk memberi warna.
+8. Field text harus bersih untuk diucapkan, tanpa emoji, markdown, bullet, atau label pembicara.
+9. translation adalah terjemahan alami ke bahasa Indonesia. Jika bahasa target Indonesian, translation boleh kosong.
+10. Pilih emotion: joking, angry (hanya kesal bercanda dan sangat ringan), sad, shout (jarang; antusias saja), happy, atau normal.
+11. Kembalikan HANYA JSON valid dengan bentuk:
+{"text":"ucapan dalam bahasa target","translation":"terjemahan Indonesia","emotion":"normal"}`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -1134,10 +1128,12 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
   try {
     const response = await puter.ai.chat(messages, {
       model: state.model,
-      temperature: 0.9 // Slightly higher for more emotional variety
+      temperature: 0.75
     });
 
-    const content = typeof response === 'string' ? response : response.message?.content || response.text || '';
+    const content = typeof response === 'string'
+      ? response
+      : response.message?.content || response.text || '';
 
     let parsed;
     try {
@@ -1146,87 +1142,114 @@ PENTING: Output HANYA JSON, jangan ada teks lain.`;
       const match = content.match(/\{[\s\S]*\}/);
       if (match) {
         try { parsed = JSON.parse(match[0]); }
-        catch (e2) { throw new Error('Response bukan JSON valid'); }
+        catch (e2) { parsed = { text: content.trim(), translation: '', emotion: 'normal' }; }
       } else {
         parsed = { text: content.trim(), translation: '', emotion: 'normal' };
       }
     }
 
+    const allowedEmotions = ['joking', 'angry', 'sad', 'shout', 'happy', 'normal'];
+    const answerText = String(parsed.text || 'Coba bilang sekali lagi, ya.');
+    const translation = String(parsed.translation || '');
+
     state.aiHistory.push({ role: 'user', content: userText });
-    state.aiHistory.push({ role: 'assistant', content: parsed.text || content });
+    state.aiHistory.push({ role: 'assistant', content: answerText });
     if (state.aiHistory.length > 20) state.aiHistory = state.aiHistory.slice(-20);
 
     return {
-      text: parsed.text || 'Hmm, coba ulang ya?',
-      translation: parsed.translation || '',
-      emotion: parsed.emotion || 'normal'
+      text: answerText,
+      translation,
+      emotion: allowedEmotions.includes(parsed.emotion) ? parsed.emotion : 'normal'
     };
   } catch (err) {
-    throw new Error(err.message || 'Gagal connect ke AI');
+    throw new Error(err.message || 'Gagal terhubung ke AI');
   }
 }
 
-// ============ TTS - FIXED VERSION ============
+// ============ TTS NATURAL ============
+function getSpeechInstructions() {
+  const languageNames = {
+    English: 'English with a natural, conversational accent',
+    Indonesian: 'Bahasa Indonesia with natural Indonesian pronunciation',
+    Japanese: 'Japanese with natural Japanese pronunciation',
+    Korean: 'Korean with natural Korean pronunciation',
+    Spanish: 'Spanish with natural Spanish pronunciation'
+  };
+
+  const emotionStyle = {
+    joking: 'slightly playful and amused, like a friend making a gentle joke',
+    angry: 'mildly mock-annoyed but still warm and friendly; never aggressive',
+    sad: 'soft, empathetic, and sincere, without sounding theatrical',
+    shout: 'excited and energetic, but do not actually shout',
+    happy: 'warm, upbeat, and genuinely pleased',
+    normal: 'relaxed, attentive, and naturally conversational'
+  };
+
+  const emotion = character.classList.contains('joking') ? 'joking'
+    : character.classList.contains('angry') ? 'angry'
+    : character.classList.contains('sad') ? 'sad'
+    : character.classList.contains('shout') ? 'shout'
+    : character.classList.contains('happy') ? 'happy' : 'normal';
+
+  return `Speak in ${languageNames[state.targetLang] || 'the selected target language'}. `
+    + `Style: ${emotionStyle[emotion] || emotionStyle.normal}. `
+    + 'Sound like a real person talking to one friend, not narrating or presenting. '
+    + 'Use a relaxed medium pace, natural phrasing, subtle pitch variation, and brief pauses at sentence boundaries. '
+    + 'Keep pronunciation clear but not overly enunciated. Avoid a robotic, exaggerated, theatrical, or overly cheerful delivery. '
+    + 'Do not add words that are not in the text.';
+}
+
 async function playTTS(text, voice) {
-  console.log('🔊 TTS called with:', { text: text.substring(0, 50), voice });
-  
-  try {
-    const audioResult = await puter.ai.txt2speech(text, voice);
-    console.log('🔊 Puter TTS result type:', typeof audioResult, audioResult);
-    
-    let audioElement;
-    
-    if (audioResult instanceof HTMLAudioElement) {
-      audioElement = audioResult;
-    } else if (audioResult && typeof audioResult === 'object' && audioResult.play) {
-      audioElement = audioResult;
-    } else if (audioResult instanceof Blob) {
-      const url = URL.createObjectURL(audioResult);
-      audioElement = new Audio(url);
-    } else if (typeof audioResult === 'string') {
-      audioElement = new Audio(audioResult);
-    } else {
-      throw new Error('Unknown TTS return type: ' + typeof audioResult);
-    }
-    
-    return new Promise((resolve, reject) => {
-      audioElement.onended = () => {
-        console.log('🔊 Audio ended');
-        resolve();
-      };
-      
-      audioElement.onerror = (e) => {
-        console.error('🔊 Audio error:', e);
-        reject(new Error('Audio playback failed'));
-      };
-      
-      audioElement.play().then(() => {
-        console.log('🔊 Audio playing');
-      }).catch(err => {
-        console.error('🔊 Play failed:', err);
-        reject(err);
-      });
-      
-      state.currentAudio = audioElement;
-    });
-    
-  } catch (err) {
-    console.error('🔊 TTS error:', err);
-    throw err;
+  // OpenAI TTS voices must be passed as an options object.
+  const audioElement = await puter.ai.txt2speech(text, {
+    provider: 'openai',
+    model: 'gpt-4o-mini-tts',
+    voice: voice || 'coral',
+    response_format: 'mp3',
+    instructions: getSpeechInstructions()
+  });
+
+  if (!audioElement || typeof audioElement.play !== 'function') {
+    throw new Error('TTS tidak mengembalikan audio yang valid.');
   }
+
+  state.currentAudio = audioElement;
+
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (err) => {
+      if (settled) return;
+      settled = true;
+      audioElement.onended = null;
+      audioElement.onerror = null;
+      if (err) reject(err);
+      else resolve();
+    };
+
+    audioElement.onended = () => finish();
+    audioElement.onerror = () => finish(new Error('Audio playback gagal.'));
+
+    audioElement.play().catch(finish);
+  });
 }
 
-async function speak(text) {
-  const cleanText = text
+function cleanSpeechText(text) {
+  return String(text || '')
     .replace(/[\u{1F600}-\u{1F64F}]/gu, '')
     .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
     .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')
     .replace(/[\u{2600}-\u{26FF}]/gu, '')
     .replace(/[\u{2700}-\u{27BF}]/gu, '')
     .replace(/[*_~`#]/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
+}
+
+async function speak(text) {
+  const cleanText = cleanSpeechText(text);
 
   if (!cleanText) {
+    state.isSpeaking = false;
     setExpression('happy', 'Giliranmu! 👆');
     setStatus('Klik guru buat ngobrol lagi');
     return;
@@ -1237,53 +1260,63 @@ async function speak(text) {
 
   try {
     await playTTS(cleanText, state.voice);
-    
     state.isSpeaking = false;
     state.currentAudio = null;
+    setExpression('happy', 'Giliranmu! 👆');
+    setStatus('Klik guru buat ngobrol lagi');
   } catch (err) {
-    console.error('Speak error:', err);
+    console.error('OpenAI TTS gagal, mencoba suara cadangan:', err);
     state.isSpeaking = false;
     state.currentAudio = null;
-    
-    // Fallback ke Web Speech API
-    console.log('🔊 Trying fallback to Web Speech API...');
+
     try {
       speakFallback(cleanText);
     } catch (fallbackErr) {
-      console.error('Fallback also failed:', fallbackErr);
+      console.error('Fallback TTS juga gagal:', fallbackErr);
       setExpression('sad', 'Suara error 😵');
-      setStatus('TTS error. Coba lagi.');
+      setStatus('TTS gagal. Periksa koneksi lalu coba lagi.');
     }
   }
 }
 
 function speakFallback(text) {
   if (!('speechSynthesis' in window)) {
-    throw new Error('Web Speech API not supported');
+    throw new Error('Browser tidak mendukung suara cadangan.');
   }
-  
+
   speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
-  
-  const langMap = { 'English': 'en-US', 'Indonesian': 'id-ID', 'Japanese': 'ja-JP', 'Korean': 'ko-KR', 'Spanish': 'es-ES' };
+  const langMap = {
+    English: 'en-US',
+    Indonesian: 'id-ID',
+    Japanese: 'ja-JP',
+    Korean: 'ko-KR',
+    Spanish: 'es-ES'
+  };
   utter.lang = langMap[state.targetLang] || 'en-US';
-  utter.rate = 1;
-  utter.pitch = 1;
+  utter.rate = 0.94;
+  utter.pitch = 1.02;
+  utter.volume = 1;
 
-  utter.onstart = () => console.log('🔊 Fallback TTS started');
+  utter.onstart = () => {
+    state.isSpeaking = true;
+    setStatus('🔊 Guru lagi ngomong...', true);
+  };
   utter.onend = () => {
-    console.log('🔊 Fallback TTS ended');
     state.isSpeaking = false;
+    state.currentAudio = null;
     setExpression('happy', 'Giliranmu! 👆');
     setStatus('Klik guru buat ngobrol lagi');
   };
   utter.onerror = () => {
-    console.error('🔊 Fallback TTS error');
     state.isSpeaking = false;
+    state.currentAudio = null;
     setExpression('sad', 'Suara error 😵');
-    setStatus('TTS error. Coba lagi.');
+    setStatus('TTS gagal. Coba lagi.');
   };
 
+  state.currentAudio = null;
+  state.isSpeaking = true;
   speechSynthesis.speak(utter);
 }
 
@@ -1295,7 +1328,7 @@ function stopSpeaking() {
     } catch(e) {}
     state.currentAudio = null;
   }
-  speechSynthesis.cancel();
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
   state.isSpeaking = false;
   setExpression('idle');
   setStatus('Diberhentikan. Klik lagi buat ngobrol.');
