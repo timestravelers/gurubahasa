@@ -484,6 +484,35 @@
     50% { height: 26px; width: 24px; border-radius: 50%; }
   }
 
+  /* Lip-sync overlay: keeps the current emotion while the voice is playing */
+  .character.is-speaking .mouth { animation: lipSync 170ms ease-in-out infinite alternate !important; }
+  .character.is-speaking .head-wrap { animation: speakingBounce 620ms ease-in-out infinite; }
+  .character.is-speaking.angry .mouth,
+  .character.is-speaking.shout .mouth { animation: angryLipSync 120ms ease-in-out infinite alternate !important; }
+  .character.is-speaking.sad .mouth { animation: sadLipSync 380ms ease-in-out infinite alternate !important; }
+  .character.is-speaking.joking .mouth,
+  .character.is-speaking.happy .mouth { animation: laughLipSync 145ms ease-in-out infinite alternate !important; }
+  @keyframes lipSync {
+    from { height: 5px; width: 17px; border-radius: 50%; }
+    to { height: 25px; width: 27px; border-radius: 45%; }
+  }
+  @keyframes angryLipSync {
+    from { height: 7px; width: 22px; transform: translateX(-50%) scaleY(.75); }
+    to { height: 31px; width: 34px; transform: translateX(-50%) scaleY(1.05); border-radius: 45%; }
+  }
+  @keyframes sadLipSync {
+    from { height: 9px; width: 19px; }
+    to { height: 17px; width: 25px; border-radius: 50%; }
+  }
+  @keyframes laughLipSync {
+    from { height: 10px; width: 27px; transform: translateX(-50%) rotate(-5deg); }
+    to { height: 29px; width: 35px; transform: translateX(-50%) rotate(4deg); border-radius: 45%; }
+  }
+  @keyframes speakingBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0) rotate(0); }
+    50% { transform: translateX(-50%) translateY(-4px) rotate(1deg); }
+  }
+
   /* Happy / Normal Smile */
   .character.happy .mouth { width: 48px; height: 22px; border-radius: 0 0 30px 30px; }
   .character.happy .eye { animation: none; height: 10px; border-radius: 10px 10px 0 0; background: #1f2937; }
@@ -1238,6 +1267,11 @@ function addEmotionTags(text) {
   }
 }
 
+function setSpeakingMotion(active) {
+  // Keep the emotion class (angry/sad/joking/shout) and toggle only the speaking layer.
+  character.classList.toggle('is-speaking', Boolean(active));
+}
+
 async function playTTS(text, voice) {
   if (!window.puter || !puter.ai || typeof puter.ai.txt2speech !== 'function') {
     throw new Error('Puter.js belum termuat. Periksa koneksi internet lalu muat ulang halaman.');
@@ -1263,12 +1297,14 @@ async function playTTS(text, voice) {
       settled = true;
       audioElement.onended = null;
       audioElement.onerror = null;
+      setSpeakingMotion(false);
       if (err) reject(err);
       else resolve();
     };
     audioElement.onended = () => finish();
     audioElement.onerror = () => finish(new Error('Audio playback gagal.'));
     const playPromise = audioElement.play();
+    setSpeakingMotion(true);
     if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(finish);
   });
 }
@@ -1340,15 +1376,18 @@ function speakFallback(text) {
 
   utter.onstart = () => {
     state.isSpeaking = true;
+    setSpeakingMotion(true);
     setStatus('🔊 Guru lagi ngomong...', true);
   };
   utter.onend = () => {
+    setSpeakingMotion(false);
     state.isSpeaking = false;
     state.currentAudio = null;
     setExpression('happy', 'Giliranmu! 👆');
     setStatus('Klik guru buat ngobrol lagi');
   };
   utter.onerror = () => {
+    setSpeakingMotion(false);
     state.isSpeaking = false;
     state.currentAudio = null;
     setExpression('sad', 'Suara error 😵');
@@ -1370,6 +1409,7 @@ function stopSpeaking() {
   }
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   state.isSpeaking = false;
+  setSpeakingMotion(false);
   setExpression('idle');
   setStatus('Diberhentikan. Klik lagi buat ngobrol.');
 }
