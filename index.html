@@ -822,18 +822,13 @@
 
     <label>Suara AI <span class="voice-preview">🎙️ NATURAL</span></label>
     <select id="voiceSelect">
-      <option value="alloy">🎙️ Alloy — netral, seimbang</option>
-      <option value="ash">🎙️ Ash — berat, maskulin</option>
-      <option value="ballad">🎙️ Ballad — lembut, bercerita</option>
-      <option value="coral">🎙️ Coral — hangat, ramah</option>
-      <option value="echo">🎙️ Echo — energik, jelas</option>
-      <option value="fable">🎙️ Fable — british, sopan</option>
-      <option value="nova">🎙️ Nova — ceria, feminin</option>
-      <option value="onyx">🎙️ Onyx — dalam, berwibawa</option>
-      <option value="sage">🎙️ Sage — tenang, bijak</option>
-      <option value="shimmer">🎙️ Shimmer — manis, lembut</option>
+      <option value="eve">🔥 Eve — energik, cocok untuk temperamental</option>
+      <option value="ara">😊 Ara — hangat, ekspresif</option>
+      <option value="rex">😤 Rex — tegas dan percaya diri</option>
+      <option value="sal">😏 Sal — santai, licin, cocok meledek</option>
+      <option value="leo">📢 Leo — kuat dan berwibawa</option>
     </select>
-    <div class="hint">💚 Menggunakan OpenAI TTS dengan arahan intonasi, tempo, dan emosi agar percakapan terasa lebih alami.</div>
+    <div class="hint">💚 Menggunakan xAI Grok TTS melalui Puter.js, dengan penanda ekspresi seperti tawa dan jeda. Hasil emosi tetap bergantung pada suara/model.</div>
     <div class="voice-card">
       <span>🔊 Coba dengerin suaranya:</span>
       <button class="preview-btn" id="previewVoice">▶️ Preview</button>
@@ -868,12 +863,13 @@
 const state = {
   targetLang: localStorage.getItem('gb_targetLang') || 'English',
   model: localStorage.getItem('gb_model') || 'gpt-4o-mini',
-  voice: localStorage.getItem('gb_voice') || 'coral',
+  voice: ['eve', 'ara', 'rex', 'sal', 'leo'].includes(localStorage.getItem('gb_voice')) ? localStorage.getItem('gb_voice') : 'eve',
   history: [],
   aiHistory: [],
   isListening: false,
   isSpeaking: false,
   currentAudio: null,
+  lastEmotion: 'normal',
 };
 
 // ============ ELEMENTS ============
@@ -1026,7 +1022,8 @@ previewVoiceBtn.addEventListener('click', async () => {
   previewVoiceBtn.textContent = '⏳ Loading...';
   previewVoiceBtn.disabled = true;
   try {
-    await playTTS("Hey, nice to meet you! So, what would you like to talk about today?", voice);
+    state.lastEmotion = 'joking';
+    await playTTS("Hei! Senang kenalan sama kamu. Tapi jangan macam-macam, ya!", voice);
     previewVoiceBtn.textContent = '▶️ Preview';
     previewVoiceBtn.disabled = false;
   } catch (err) {
@@ -1122,6 +1119,7 @@ async function handleUserInput(text) {
     
     // Apply emotion from AI response
     const emotion = reply.emotion || 'normal';
+    state.lastEmotion = emotion;
     setExpression(emotion, reply.text, reply.translation);
     
     await speak(reply.text);
@@ -1208,47 +1206,49 @@ Aturan:
   }
 }
 
-// ============ TTS NATURAL ============
-function getSpeechInstructions() {
-  const languageNames = {
-    English: 'English with a natural, conversational accent',
-    Indonesian: 'Bahasa Indonesia with natural Indonesian pronunciation',
-    Japanese: 'Japanese with natural Japanese pronunciation',
-    Korean: 'Korean with natural Korean pronunciation',
-    Spanish: 'Spanish with natural Spanish pronunciation'
+// ============ EXPRESSIVE XAI / GROK TTS ============
+function languageCode() {
+  const map = {
+    English: 'en',
+    Indonesian: 'id',
+    Japanese: 'ja',
+    Korean: 'ko',
+    Spanish: 'es'
   };
+  return map[state.targetLang] || 'auto';
+}
 
-  const emotionStyle = {
-    joking: 'mischievous, cheeky, teasing, and a little sarcastic, like close friends roasting each other',
-    angry: 'hot-tempered, comically irritated and sharp, like a friend snapping back after being teased; use punchy emphasis and varied intensity, but keep it playful rather than genuinely threatening',
-    sad: 'soft, empathetic, and sincere, without sounding theatrical',
-    shout: 'loud, explosive, comically exasperated, as if ranting about something ridiculous; energetic and expressive without becoming frightening',
-    happy: 'warm, upbeat, and genuinely pleased',
-    normal: 'relaxed, attentive, and naturally conversational'
-  };
-
-  const emotion = character.classList.contains('joking') ? 'joking'
-    : character.classList.contains('angry') ? 'angry'
-    : character.classList.contains('sad') ? 'sad'
-    : character.classList.contains('shout') ? 'shout'
-    : character.classList.contains('happy') ? 'happy' : 'normal';
-
-  return `Speak in ${languageNames[state.targetLang] || 'the selected target language'}. `
-    + `Style: ${emotionStyle[emotion] || emotionStyle.normal}. `
-    + 'Sound like a real person talking to one friend, not narrating or presenting. '
-    + 'Use a relaxed medium pace, natural phrasing, subtle pitch variation, and brief pauses at sentence boundaries. '
-    + 'Keep pronunciation clear but not overly enunciated. Avoid a robotic, exaggerated, theatrical, or overly cheerful delivery. '
-    + 'Do not add words that are not in the text.';
+function addEmotionTags(text) {
+  const clean = String(text || '').trim();
+  switch (state.lastEmotion) {
+    case 'joking':
+      return `[pause] ${clean} [laugh]`;
+    case 'angry':
+      // A pause and emphatic punctuation help convey a comic outburst without inventing dialogue.
+      return `[pause] ${clean.replace(/([.!?])\s+/g, '$1 ... ')}`;
+    case 'shout':
+      return `[pause] ${clean.replace(/([.!?])?$/, '!!')}`;
+    case 'sad':
+      // xAI documents whisper wrapping, but not a dedicated crying tag.
+      return `<whisper>${clean}</whisper> [pause]`;
+    case 'happy':
+      return `${clean} [laugh]`;
+    default:
+      return clean;
+  }
 }
 
 async function playTTS(text, voice) {
-  // OpenAI TTS voices must be passed as an options object.
-  const audioElement = await puter.ai.txt2speech(text, {
-    provider: 'openai',
-    model: 'gpt-4o-mini-tts',
-    voice: voice || 'coral',
-    response_format: 'mp3',
-    instructions: getSpeechInstructions()
+  if (!window.puter || !puter.ai || typeof puter.ai.txt2speech !== 'function') {
+    throw new Error('Puter.js belum termuat. Periksa koneksi internet lalu muat ulang halaman.');
+  }
+
+  const expressiveText = addEmotionTags(text);
+  const audioElement = await puter.ai.txt2speech(expressiveText, {
+    provider: 'xai',
+    voice: voice || 'eve',
+    language: languageCode(),
+    output_format: 'mp3'
   });
 
   if (!audioElement || typeof audioElement.play !== 'function') {
@@ -1256,7 +1256,6 @@ async function playTTS(text, voice) {
   }
 
   state.currentAudio = audioElement;
-
   return new Promise((resolve, reject) => {
     let settled = false;
     const finish = (err) => {
@@ -1267,11 +1266,10 @@ async function playTTS(text, voice) {
       if (err) reject(err);
       else resolve();
     };
-
     audioElement.onended = () => finish();
     audioElement.onerror = () => finish(new Error('Audio playback gagal.'));
-
-    audioElement.play().catch(finish);
+    const playPromise = audioElement.play();
+    if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(finish);
   });
 }
 
@@ -1307,7 +1305,7 @@ async function speak(text) {
     setExpression('happy', 'Giliranmu! 👆');
     setStatus('Klik guru buat ngobrol lagi');
   } catch (err) {
-    console.error('OpenAI TTS gagal, mencoba suara cadangan:', err);
+    console.error('xAI TTS gagal, mencoba suara cadangan:', err);
     state.isSpeaking = false;
     state.currentAudio = null;
 
